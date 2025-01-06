@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Invoice Details</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .invoice-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(26, 115, 232, 0.1);
+        max-width: 800px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .invoice-header {
+        background: #1a73e8;
+        padding: 2rem;
+        color: white;
+        position: relative;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header-content h1 {
+        font-size: 2rem;
+        font-weight: 600;
+      }
+
+      .close-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+      }
+
+      .invoice-content {
+        padding: 2rem;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .info-item {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+      }
+
+      .info-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-item label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.75rem;
+        display: block;
+      }
+
+      .info-item .value {
+        color: #212529;
+        font-size: 1.125rem;
+        font-weight: 600;
+      }
+
+      .timeline-section {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 12px;
+      }
+
+      .timeline-header {
+        color: #1a73e8;
+        margin-bottom: 2rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .timeline {
+        position: relative;
+        padding-left: 2rem;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background: linear-gradient(to bottom, #1a73e8 60%, #dee2e6 60%);
+      }
+
+      .timeline-item {
+        margin-bottom: 2rem;
+        position: relative;
+        padding-left: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .timeline-item::before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #1a73e8;
+        position: absolute;
+        left: -1.5rem;
+        top: 0.25rem;
+        transition: all 0.3s ease;
+      }
+
+      .timeline-item.pending::before {
+        background: #dc3545;
+      }
+
+      .timeline-item .role {
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+      }
+
+      .timeline-item .timestamp {
+        color: #6c757d;
+        font-size: 0.875rem;
+      }
+
+      .timeline-item.pending .timestamp {
+        color: #dc3545;
+        font-style: italic;
+      }
+
+      @media (max-width: 768px) {
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice-card">
+      <header class="invoice-header">
+        <div class="header-content">
+          <h1>Invoice Details</h1>
+          <button class="close-btn" onclick="closeInvoice()">&times;</button>
+        </div>
+      </header>
+
+      <div class="invoice-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Invoice No.</label>
+            <div class="value">001</div>
+          </div>
+          <div class="info-item">
+            <label>Date</label>
+            <div class="value">2024-12-30</div>
+          </div>
+          <div class="info-item">
+            <label>Party Code</label>
+            <div class="value">P001</div>
+          </div>
+          <div class="info-item">
+            <label>Medical Name</label>
+            <div class="value">Raj Medical</div>
+          </div>
+          <div class="info-item">
+            <label>City</label>
+            <div class="value">Rajura</div>
+          </div>
+        </div>
+
+        <div class="timeline-section">
+          <h2 class="timeline-header">Processing Timeline</h2>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="role">Invoice Generator - Kirti Patel</div>
+              <div class="timestamp">2024-12-30 10:00:00</div>
+            </div>
+            <div class="timeline-item">
+              <div class="role">Checker - Dheeraj</div>
+              <div class="timestamp">2024-12-30 11:30:00</div>
+            </div>
+            <div class="timeline-item">
+              <div class="role">Packer - Laxmi</div>
+              <div class="timestamp">2024-12-30 13:00:00</div>
+            </div>
+            <div class="timeline-item pending">
+              <div class="role">Picked up By</div>
+              <div class="timestamp">Raju Rastogi</div>
+            </div>
+            <div class="timeline-item pending">
+              <div class="role">Delivered By</div>
+              <div class="timestamp">Pending</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function closeInvoice() {
+        alert("Close button clicked");
+      }
+
+      // Add hover and click effects
+      document.querySelectorAll(".timeline-item").forEach((item) => {
+        item.addEventListener("mouseenter", () => {
+          item.style.transform = "translateX(10px)";
+          const dot = item.querySelector("::before");
+          if (dot) {
+            dot.style.transform = "scale(1.5)";
+          }
+        });
+
+        item.addEventListener("mouseleave", () => {
+          item.style.transform = "translateX(0)";
+          const dot = item.querySelector("::before");
+          if (dot) {
+            dot.style.transform = "scale(1)";
+          }
+        });
+
+        item.addEventListener("click", () => {
+          item.style.transform = "translateX(5px)";
+          setTimeout(() => {
+            item.style.transform = "translateX(0)";
+          }, 200);
+        });
+      });
+    </script>
+  </body>
+</html>

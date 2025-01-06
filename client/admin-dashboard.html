@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta char""set="UTF-8" /> <meta"" name="viewport"
+    co""ntent="width=device-width, initial-""scale=1.0" />
+    <title>Admin Dashboard - Sanjeevan Medico Traders</title>
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #1e40af;
+        --accent-color: #2a77f3;
+        --background-color: #f3f4f6;
+        --text-color: #333;
+        --white: #ffffff;
+        --error-color: #e74c3c;
+        --success-color: #2ecc71;
+        --warning-color: #f1c40f;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        font-family: Arial, sans-serif;
+        margin-bottom: 150px;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--secondary-color) 0%,
+          var(--primary-color) 100%
+        );
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        font-size: 2.25rem;
+        font-weight: bold;
+      }
+
+      .greeting-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: linear-gradient(to right, #616161, #757575);
+        color: white;
+        font-size: 1rem;
+      }
+
+      .logout {
+        background-color: #d32f2f;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease;
+      }
+
+      .logout:hover {
+        background-color: #b71c1c;
+      }
+
+      /* Date filter container */
+      .date-filter-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 1rem;
+        padding: 1rem;
+        background-color: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .date-filter-container label {
+        font-weight: bold;
+        margin-right: 0.25rem;
+      }
+
+      .date-filter-container select,
+      .date-filter-container input[type="date"] {
+        padding: 0.25rem;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-card h3 {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .stat-card .number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+
+      .table-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        border-right: 1px solid #ddd;
+      }
+
+      th {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+      }
+
+      tbody tr:hover {
+        background-color: #e2e4e6;
+        cursor: pointer;
+      }
+
+      .status-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+      }
+
+      .status-complete {
+        color: var(--success-color);
+      }
+
+      .status-incomplete {
+        color: var(--error-color);
+      }
+
+      .status-pending {
+        color: #666;
+      }
+
+      footer {
+        background-color: var(--primary-color);
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .table-container {
+          overflow-x: auto;
+        }
+
+        th,
+        td {
+          padding: 0.75rem;
+          font-size: 0.9rem;
+        }
+
+        .status-icon {
+          width: 32px;
+          height: 32px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1>Sanjeevan Medico Traders</h1>
+    </header>
+
+    <div class="greeting-container">
+      <div class="greeting" id="greeting"></div>
+      <button class="logout" onclick="handleLogout()">Logout</button>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="date-filter-container">
+      <label for="filter-select">Filter by:</label>
+      <select id="filter-select" onchange="handleFilterChange()">
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="custom">Custom Range</option>
+      </select>
+
+      <div id="custom-date-range" style="display: none">
+        <label for="start-date">Start:</label>
+        <input type="date" id="start-date" />
+        <label for="end-date">End:</label>
+        <input type="date" id="end-date" />
+      </div>
+
+      <button onclick="filterByDate()">Apply</button>
+      <div style="display: flex; gap: 1rem; margin: 1rem">
+        <label for="searchInvoice">Search by Invoice No.:</label>
+        <input type="text" id="searchInvoice" oninput="applySearchFilters()" />
+
+        <label for="searchPartyCode">Search by Party Code:</label>
+        <input
+          type="text"
+          id="searchPartyCode"
+          oninput="applySearchFilters()"
+        />
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <line x1="10" y1="9" x2="8" y2="9"></line>
+            </svg>
+            Total Invoices
+          </h3>
+          <div class="number" id="total-invoices">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Checked
+          </h3>
+          <div class="number" id="total-checked">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+              ></path>
+            </svg>
+            Packed
+          </h3>
+          <div class="number" id="total-packed">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            Delivered
+          </h3>
+          <div class="number" id="total-delivered">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              version="1.0"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <metadata fill="#3b82f6"></metadata>
+              <g
+                transform="translate(0,24) scale(0.001875,-0.001875)"
+                fill="#3b82f6"
+                stroke="none"
+              >
+                <path
+                  d="M3037 12084 c-206 -37 -382 -129 -533 -279 -132 -131 -214 -274 -266 -465 -33 -123 -33 -357 0 -480 52 -190 133 -333 266 -466 134 -133 288 -220 476 -267 123 -31 339 -30 465 1 200 50 416 187 540 345 110 138 179 292 209 463 94 535 -276 1054 -820 1149 -105 18 -233 18 -337 -1z"
+                />
+                <path
+                  d="M10050 12075 c-392 -74 -695 -356 -796 -740 -23 -86 -26 -121 -26 -245 0 -124 3 -159 26 -245 139 -531 674 -855 1201 -726 355 87 621 344 731 706 26 83 28 103 28 265 0 162 -2 182 -28 265 -132 438 -491 718 -936 731 -81 2 -151 -2 -200 -11z"
+                />
+                <path
+                  d="M6298 10268 l-3 -923 -58 -7 c-61 -8 -134 -40 -192 -84 -19 -14 -182 -202 -362 -416 -223 -267 -328 -386 -333 -377 -4 8 -33 103 -64 211 -31 109 -68 231 -82 270 -119 330 -378 624 -690 781 -89 45 -225 93 -339 120 -87 20 -115 21 -933 24 -920 4 -911 5 -1095 -54 -353 -111 -699 -413 -858 -747 -36 -75 -69 -191 -289 -996 -52 -191 -247 -900 -326 -1185 -42 -154 -79 -292 -82 -308 l-4 -27 437 2 438 3 178 645 c264 959 268 973 313 1135 l42 150 107 3 c59 1 107 0 107 -2 0 -5 -506 -1889 -516 -1918 -5 -17 73 -18 1550 -18 856 0 1556 2 1556 4 0 3 -63 224 -141 493 -340 1182 -409 1422 -409 1432 0 7 37 11 109 11 l109 0 30 -92 c38 -116 67 -207 182 -578 51 -162 105 -322 120 -355 58 -127 167 -236 271 -270 115 -39 260 -1 372 96 26 22 303 348 615 725 629 758 641 775 650 907 5 85 -13 162 -53 221 -14 20 -25 39 -25 41 0 3 126 5 280 5 l280 0 0 1000 0 1000 -445 0 -445 0 -2 -922z"
+                />
+                <path
+                  d="M8782 9865 c-186 -29 -308 -92 -438 -226 -58 -60 -1886 -2248 -2002 -2396 -157 -201 -144 -443 34 -619 181 -180 443 -191 627 -25 22 20 461 533 975 1141 514 608 941 1112 948 1120 12 12 14 -178 14 -1263 l0 -1277 -4470 0 -4470 0 0 -565 0 -565 4470 0 4470 0 3 -2348 c3 -2616 -4 -2376 71 -2527 46 -92 101 -153 189 -213 106 -70 196 -97 327 -97 121 0 176 13 275 64 125 64 216 176 267 326 l23 70 3 2363 2 2362 115 0 115 0 3 -2337 c2 -2170 4 -2342 20 -2401 29 -105 83 -200 156 -272 112 -111 234 -160 396 -160 276 0 481 159 562 435 17 56 18 199 21 2398 l2 2337 655 0 655 0 0 565 0 565 -287 2 -288 3 -5 1500 -5 1500 -27 67 c-39 97 -74 153 -141 225 -104 110 -230 183 -407 232 l-95 26 -1340 2 c-1056 1 -1358 -1 -1423 -12z"
+                />
+              </g>
+            </svg>
+
+            OTC Orders
+          </h3>
+          <div class="number" id="total-otc-orders">0</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function applySearchFilters() {
+        let filteredData = [...invoices];
+        const invoiceValue = document
+          .getElementById("searchInvoice")
+          .value.trim()
+          .toLowerCase();
+        const partyValue = document
+          .getElementById("searchPartyCode")
+          .value.trim()
+          .toLowerCase();
+
+        if (invoiceValue) {
+          filteredData = filteredData.filter((inv) =>
+            inv.id.toLowerCase().includes(invoiceValue)
+          );
+        }
+        if (partyValue) {
+          filteredData = filteredData.filter((inv) =>
+            inv.partyCode.toLowerCase().includes(partyValue)
+          );
+        }
+        updateDashboard(filteredData);
+      }
+    </script>
+
+    <div class="container">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>S. No.</th>
+              <th>Invoice No.</th>
+              <th>Date</th>
+              <th>Party Code</th>
+              <th>Medical Name</th>
+              <th>City</th>
+              <th>Generated</th>
+              <th>Checked</th>
+              <th>Packed</th>
+              <th>Delivered</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; Sanjeevan Medico Traders, <span id="current-year"></span></p>
+    </footer>
+
+    <script>
+      const invoices = [
+        {
+          id: "3501",
+          date: "2024-12-30",
+          partyCode: "P001",
+          medicalName: "Raj Medical",
+          city: "Rajura",
+          status: {
+            generated: true,
+            checked: true,
+            packed: true,
+            delivered: false,
+          },
+          lastUpdated: "2024-12-30 14:15:00",
+        },
+        {
+          id: "002",
+          date: "2024-12-30",
+          partyCode: "P003",
+          medicalName: "Prime Medical",
+          city: "Chandrapur",
+          status: {
+            generated: true,
+            checked: true,
+            packed: false,
+            delivered: false,
+          },
+          lastUpdated: "2024-12-30 13:45:00",
+        },
+        {
+          id: "3502",
+          date: "2024-12-31",
+          partyCode: "P002",
+          medicalName: "Sunshine Pharmacy",
+          city: "Mumbai",
+          status: {
+            generated: true,
+            checked: true,
+            packed: true,
+            delivered: true,
+          },
+          lastUpdated: "2024-12-31 10:00:00",
+        },
+      ];
+
+      // new code.
+      function createStatusIcon(status) {
+        if (status === null) {
+          return '<span class="status-icon status-pending">⊘</span>';
+        }
+        return status
+          ? '<span class="status-icon status-complete">✓</span>'
+          : '<span class="status-icon status-incomplete">✗</span>';
+      }
+
+      function updateDashboard(filtered = null) {
+        let data = invoices;
+        if (filtered) data = filtered;
+
+        document.getElementById("total-invoices").textContent = data.length;
+        document.getElementById("total-checked").textContent = data.filter(
+          (inv) => inv.status.checked
+        ).length;
+        document.getElementById("total-packed").textContent = data.filter(
+          (inv) => inv.status.packed
+        ).length;
+        document.getElementById("total-delivered").textContent = data.filter(
+          (inv) => inv.status.delivered
+        ).length;
+
+        const tableBody = document.getElementById("invoice-table-body");
+        tableBody.innerHTML = data
+          .map(
+            (invoice, index) => `
+              <tr>
+                  <td>${index + 1}</td>
+                  <td>${invoice.id}</td>
+                  <td>${invoice.date}</td>
+                  <td>${invoice.partyCode}</td>
+                  <td>${invoice.medicalName}</td>
+                  <td>${invoice.city}</td>
+                  <td>${createStatusIcon(invoice.status.generated)}</td>
+                  <td>${createStatusIcon(invoice.status.checked)}</td>
+                  <td>${createStatusIcon(invoice.status.packed)}</td>
+                  <td>${createStatusIcon(invoice.status.delivered)}</td>
+                  <td>${invoice.lastUpdated}</td>
+              </tr>
+            `
+          )
+          .join("");
+      }
+
+      function updateGreeting() {
+        const now = new Date();
+        const hour = now.getHours();
+        let greeting = "Good Evening";
+        if (hour < 12) greeting = "Good Morning";
+        else if (hour < 18) greeting = "Good Afternoon";
+
+        document.getElementById("greeting").textContent = `${greeting}, Admin`;
+      }
+
+      function handleLogout() {
+        if (confirm("Are you sure you want to logout?")) {
+          window.location.href = "/login.html";
+        }
+      }
+
+      // DATE FILTER FUNCTIONS
+      function handleFilterChange() {
+        const selectValue = document.getElementById("filter-select").value;
+        document.getElementById("custom-date-range").style.display =
+          selectValue === "custom" ? "block" : "none";
+      }
+
+      function filterByDate() {
+        const selectValue = document.getElementById("filter-select").value;
+        const today = new Date().toISOString().split("T")[0];
+        const yesterday = new Date(Date.now() - 86400000)
+          .toISOString()
+          .split("T")[0];
+        let filtered = [...invoices];
+
+        if (selectValue === "today") {
+          filtered = filtered.filter((inv) => inv.date === today);
+        } else if (selectValue === "yesterday") {
+          filtered = filtered.filter((inv) => inv.date === yesterday);
+        } else if (selectValue === "custom") {
+          const start = document.getElementById("start-date").value;
+          const end = document.getElementById("end-date").value;
+          if (start && end) {
+            filtered = filtered.filter(
+              (inv) => inv.date >= start && inv.date <= end
+            );
+          }
+        }
+        updateDashboard(filtered);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("current-year").textContent =
+          new Date().getFullYear();
+        updateGreeting();
+        updateDashboard();
+      });
+    </script>
+  </body>
+</html>

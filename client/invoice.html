@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Management - Sanjeevan Medico Traders</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- SweetAlert2 for confirmation dialogs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #3b82f6;
+        --accent-color: #2a77f3;
+        --background-color: #ecf0f1;
+        --text-color: #333;
+        --white: #ffffff;
+        --error-color: #e74c3c;
+        --highlight-color: #fff3cd;
+        --error-border: #dc3545;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        font-size: 2.25rem;
+        font-weight: bold;
+      }
+
+      .greeting-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: linear-gradient(to right, #616161, #757575);
+        color: white;
+        font-size: 1rem;
+      }
+
+      .greeting-container .logout {
+        background-color: #d32f2f;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease;
+      }
+
+      .greeting-container .logout:hover {
+        background-color: #b71c1c;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .date-invoice-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .control-group {
+        margin-bottom: 15px;
+      }
+
+      .control-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--text-color);
+        font-weight: 500;
+      }
+
+      input[type="date"],
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d1d1;
+        border-radius: 4px;
+        transition: border-color 0.3s ease;
+      }
+
+      .table-wrapper {
+        overflow-x: auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        text-align: center;
+      }
+
+      th {
+        background-color: var(--secondary-color);
+        color: var(--white);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .highlighted {
+        background-color: var(--highlight-color);
+      }
+
+      .error-field {
+        border: 2px solid var(--error-border) !important;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-weight: 500;
+      }
+
+      .btn-save {
+        background-color: var(--accent-color);
+        color: white;
+      }
+
+      .btn-reset {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .btn-view {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .custom-file-upload {
+        display: inline-block;
+        padding: 8px 16px;
+        cursor: pointer;
+        background-color: #6c757d;
+        color: white;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+
+      .custom-file-upload:hover {
+        background-color: #5a6268;
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .pagination button {
+        padding: 8px 16px;
+        border: 1px solid var(--accent-color);
+        background: white;
+        color: var(--accent-color);
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .pagination button.active {
+        background: var(--accent-color);
+        color: white;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+      }
+
+      .modal-content {
+        position: relative;
+        background-color: white;
+        margin: 20px auto;
+        padding: 20px;
+        width: 90%;
+        max-width: 800px;
+        border-radius: 8px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 10px;
+      }
+
+      .modal-body {
+        overflow-y: auto;
+        flex-grow: 1;
+      }
+
+      .modal-body img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .container {
+          padding: 10px;
+        }
+
+        th,
+        td {
+          padding: 8px;
+          font-size: 0.9rem;
+        }
+
+        .btn {
+          padding: 6px 12px;
+          font-size: 0.9rem;
+        }
+
+        .custom-file-upload {
+          padding: 6px 12px;
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header h1 {
+          font-size: 1.5rem;
+        }
+
+        .table-wrapper {
+          font-size: 0.8rem;
+        }
+
+        .btn {
+          padding: 4px 8px;
+          font-size: 0.8rem;
+        }
+      }
+
+      /* CSS for Checkbox */
+      .otc-checkbox-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .otc-checkbox {
+        display: none; /* Hide the default checkbox */
+      }
+
+      .custom-checkbox-label {
+        width: 22px;
+        height: 22px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        display: inline-block;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease,
+          box-shadow 0.3s ease;
+        position: relative;
+        background-color: white;
+      }
+
+      .custom-checkbox-label:hover {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      .otc-checkbox:checked + .custom-checkbox-label {
+        background-color: #007bff;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.75);
+      }
+
+      .otc-checkbox:checked + .custom-checkbox-label::after {
+        content: "✔";
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1>Sanjeevan Medico Traders</h1>
+    </header>
+
+    <div class="greeting-container">
+      <div class="greeting" id="greeting"></div>
+      <div>
+        <button
+          class="logout"
+          id="logout-btn"
+          onclick="location.href='/login.html'"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="dateInvoiceControls" class="controls date-invoice-section">
+        <h2>Add Invoice</h2>
+        <div class="control-group">
+          <label for="globalDate">Select Date</label>
+          <input type="date" id="globalDate" />
+        </div>
+        <div class="control-group">
+          <label for="startInvoice">Start Invoice Number</label>
+          <input type="text" id="startInvoice" placeholder="--" />
+        </div>
+      </div>
+
+      <div class="table-section">
+        <div class="table-wrapper">
+          <table id="invoiceTable">
+            <thead>
+              <tr>
+                <th>SR</th>
+                <th>Date</th>
+                <th>Invoice No.</th>
+                <th>Party Code</th>
+                <th>Image 1</th>
+                <th>Image 2</th>
+                <th>Save</th>
+                <th>Reset</th>
+                <th>OTC</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+
+            <tbody id="invoiceBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Image Preview</h2>
+          <div class="modal-buttons">
+            <button class="btn btn-download" id="downloadBtn">Download</button>
+            <button class="btn btn-close" id="closeModal">Close</button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <img id="previewImage" src="" alt="Preview" />
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
+
+    <script>
+      // Constants and Global Variables
+      const rowsPerPage = 100;
+      let currentPage = 1;
+      let totalRows = 300;
+      let currentImageFile = null;
+
+      // DOM Elements
+      const modal = document.getElementById("imageModal");
+      const modalImg = document.getElementById("previewImage");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const globalDateInput = document.getElementById("globalDate");
+      const startInvoiceInput = document.getElementById("startInvoice");
+
+      // Initialize with default values
+      globalDateInput.valueAsDate = new Date();
+
+      // Utility Functions
+      function formatDate(date) {
+        const d = new Date(date);
+        return `${d.getDate().toString().padStart(2, "0")}-${(d.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}-${d.getFullYear()}`;
+      }
+
+      function createRow(index) {
+        const startInvoice = startInvoiceInput.value;
+        const date = globalDateInput.value;
+        const invoiceNo =
+          startInvoice !== "- -"
+            ? String(Number(startInvoice) + index).padStart(
+                startInvoice.length,
+                "0"
+              )
+            : "- -";
+
+        return `
+    <tr class="highlighted" data-row="${index + 1}">
+      <td>${index + 1}</td>
+      <td>${formatDate(date)}</td>
+      <td>${invoiceNo}</td>
+      <td>
+        <input type="text" class="party-code" placeholder="Enter Party Code">
+      </td>
+      <td>
+        <div class="image-upload-container">
+          <label class="custom-file-upload">
+            <input type="file" class="image1" accept="image/*" required style="display: none;">
+            Upload Image 1
+          </label>
+          <button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
+        </div>
+      </td>
+      <td>
+        <div class="image-upload-container">
+          <label class="custom-file-upload">
+            <input type="file" class="image2" accept="image/*" style="display: none;">
+            Upload Image 2
+          </label>
+          <button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-save" onclick="saveRow(this)">Save</button>
+      </td>
+      <td>
+        <button class="btn btn-reset" onclick="confirmReset(this)">Reset</button>
+      </td>
+      <td>
+       <div class="otc-checkbox-wrapper">
+  <input type="checkbox" id="otc-checkbox" class="otc-checkbox">
+  <label for="otc-checkbox" class="custom-checkbox-label"></label>
+</div>
+      </td>
+      <td class="timestamp"></td>
+    </tr>
+  `;
+      }
+
+      // Table Management Functions
+      function updateTable() {
+        const tbody = document.getElementById("invoiceBody");
+        tbody.innerHTML = "";
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = Math.min(start + rowsPerPage, totalRows);
+
+        for (let i = start; i < end; i++) {
+          tbody.insertAdjacentHTML("beforeend", createRow(i));
+        }
+
+        updatePagination();
+        toggleDateInvoiceControls();
+      }
+
+      function updatePagination() {
+        const pagination = document.getElementById("pagination");
+        const pageCount = Math.ceil(totalRows / rowsPerPage);
+
+        let html = "";
+        for (let i = 1; i <= pageCount; i++) {
+          html += `
+              <button class="${i === currentPage ? "active" : ""}"
+                      onclick="changePage(${i})">${i}</button>
+            `;
+        }
+
+        if (currentPage === pageCount) {
+          html += `
+              <button class="add-more-btn" onclick="addMore()">Add More</button>
+            `;
+        }
+
+        pagination.innerHTML = html;
+      }
+
+      function toggleDateInvoiceControls() {
+        const controls = document.getElementById("dateInvoiceControls");
+        controls.style.display = currentPage === 1 ? "block" : "none";
+      }
+
+      function changePage(page) {
+        currentPage = page;
+        updateTable();
+      }
+
+      function addMore() {
+        totalRows += 1; // Increment total rows by 1
+        const tbody = document.getElementById("invoiceBody");
+        const newRowIndex = totalRows - 1; // Index of the new row
+
+        // Add the new row at the end of the table
+        tbody.insertAdjacentHTML("beforeend", createRow(newRowIndex));
+
+        updatePagination(); // Refresh pagination to ensure it remains consistent
+      }
+
+      // Row Management Functions
+      function validateRow(row) {
+        const partyCode = row.querySelector(".party-code");
+        const image1 = row.querySelector(".image1");
+        let isValid = true;
+
+        // Reset previous error states
+        partyCode.classList.remove("error-field");
+        image1.closest(".custom-file-upload").classList.remove("error-field");
+
+        if (!partyCode.value) {
+          partyCode.classList.add("error-field");
+          isValid = false;
+        }
+
+        if (!image1.files.length) {
+          image1.closest(".custom-file-upload").classList.add("error-field");
+          isValid = false;
+        }
+
+        return isValid;
+      }
+      function addMore() {
+        totalRows++;
+        updateTable();
+      }
+      function saveRow(btn) {
+        const row = btn.closest("tr");
+
+        if (!validateRow(row)) {
+          return;
+        }
+
+        // Check if OTC checkbox is checked
+        const otcCheckbox = row.querySelector(".otc-checkbox");
+        if (otcCheckbox.checked) {
+          Swal.fire({
+            title: "Warning!",
+            text: "You have marked this invoice as OTC.",
+            icon: "warning",
+            confirmButtonText: "OK",
+          });
+        }
+
+        // Update timestamp
+        const timestamp = new Date().toLocaleString();
+        row.querySelector(".timestamp").textContent = timestamp;
+
+        // Show view buttons if files are selected
+        const image1Container = row
+          .querySelector(".image1")
+          .closest(".image-upload-container");
+        const image2Container = row
+          .querySelector(".image2")
+          .closest(".image-upload-container");
+
+        if (row.querySelector(".image1").files.length) {
+          image1Container.querySelector(".btn-view").style.display =
+            "inline-block";
+        }
+
+        if (row.querySelector(".image2").files.length) {
+          image2Container.querySelector(".btn-view").style.display =
+            "inline-block";
+        }
+
+        // Remove highlighting
+        row.classList.remove("highlighted");
+      }
+
+      async function confirmReset(btn) {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "This will clear all data in this row. This action cannot be undone!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc3545",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Clear Row",
+        });
+
+        if (result.isConfirmed) {
+          resetRow(btn);
+        }
+      }
+
+      function resetRow(btn) {
+        const row = btn.closest("tr");
+
+        // Reset all inputs
+        row.querySelector(".party-code").value = "";
+        row.querySelector(".image1").value = "";
+        row.querySelector(".image2").value = "";
+
+        // Hide view buttons
+        row
+          .querySelectorAll(".btn-view")
+          .forEach((btn) => (btn.style.display = "none"));
+
+        // Reset timestamp
+        row.querySelector(".timestamp").textContent = "";
+
+        // Add highlighting
+        row.classList.add("highlighted");
+
+        // Remove any error states
+        row
+          .querySelectorAll(".error-field")
+          .forEach((el) => el.classList.remove("error-field"));
+      }
+
+      // Image Management Functions
+      function previewImage(btn) {
+        const row = btn.closest("tr");
+        const imageInput = btn
+          .closest(".image-upload-container")
+          .querySelector('input[type="file"]');
+        const file = imageInput.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            modalImg.src = e.target.result;
+            currentImageFile = file;
+            modal.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function handleFileInputChange(e) {
+        if (e.target.matches('input[type="file"]')) {
+          const container = e.target.closest(".image-upload-container");
+          const viewBtn = container.querySelector(".btn-view");
+          viewBtn.style.display = e.target.files.length
+            ? "inline-block"
+            : "none";
+        }
+      }
+
+      // Event Listeners
+      document.getElementById("closeModal").onclick = function () {
+        modal.style.display = "none";
+      };
+
+      downloadBtn.onclick = function () {
+        if (currentImageFile) {
+          const url = URL.createObjectURL(currentImageFile);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = currentImageFile.name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      };
+
+      window.onclick = function (event) {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      document.addEventListener("change", handleFileInputChange);
+      globalDateInput.addEventListener("change", updateTable);
+      startInvoiceInput.addEventListener("input", updateTable);
+
+      // Initialize table
+      updateTable();
+      // Function to save data to localStorage
+      function saveDataToStorage(data) {
+        localStorage.setItem("invoiceData", JSON.stringify(data));
+      }
+
+      // Function to load data from localStorage
+      function loadDataFromStorage() {
+        const data = localStorage.getItem("invoiceData");
+        return data ? JSON.parse(data) : [];
+      }
+
+      // Function to render data into the table
+      function renderTable(data) {
+        const tableBody = document.querySelector("#invoiceTable tbody");
+        tableBody.innerHTML = "";
+
+        data.forEach((row, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${row.item}</td>
+            <td>${row.quantity}</td>
+            <td>${row.price}</td>
+            <td>${row.total}</td>
+            <td><button class="delete-row" data-index="${index}">Delete</button></td>
+        `;
+          tableBody.appendChild(tr);
+        });
+      }
+
+      // Event listener for adding a new row
+      const addRowButton = document.getElementById("addRow");
+      addRowButton.addEventListener("click", () => {
+        const itemInput = document.getElementById("item");
+        const quantityInput = document.getElementById("quantity");
+        const priceInput = document.getElementById("price");
+
+        const item = itemInput.value.trim();
+        const quantity = parseFloat(quantityInput.value);
+        const price = parseFloat(priceInput.value);
+
+        if (!item || isNaN(quantity) || isNaN(price)) {
+          alert("Please fill in all fields correctly.");
+          return;
+        }
+
+        const total = quantity * price;
+
+        const currentData = loadDataFromStorage();
+        currentData.push({ item, quantity, price, total });
+        saveDataToStorage(currentData);
+
+        renderTable(currentData);
+
+        itemInput.value = "";
+        quantityInput.value = "";
+        priceInput.value = "";
+      });
+
+      // Event listener for deleting a row
+      const tableBody = document.querySelector("#invoiceTable tbody");
+      tableBody.addEventListener("click", (event) => {
+        if (event.target.classList.contains("delete-row")) {
+          const index = event.target.getAttribute("data-index");
+          const currentData = loadDataFromStorage();
+          currentData.splice(index, 1);
+          saveDataToStorage(currentData);
+          renderTable(currentData);
+        }
+      });
+
+      // Initial table rendering
+      document.addEventListener("DOMContentLoaded", () => {
+        const savedData = loadDataFromStorage();
+        renderTable(savedData);
+      });
+      // OTC
+      const otcCheckbox = document.getElementById("otc-checkbox");
+
+      otcCheckbox.addEventListener("change", function (event) {
+        if (this.checked) {
+          const confirmation = confirm(
+            "By selecting this option, you are marking this order under OTC (On The Counter) order type."
+          );
+          if (!confirmation) {
+            this.checked = false; // Uncheck the checkbox if user cancels
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

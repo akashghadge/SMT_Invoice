@@ -1,0 +1,276 @@
+<!-- HTML -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Selection Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      /* General Body and Container Styles */
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        min-width: 100%;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        font-size: 2.25rem;
+        font-weight: bold;
+      }
+
+      .greeting-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: linear-gradient(to right, #616161, #757575);
+        color: white;
+        font-size: 1rem;
+      }
+      .greeting-container .logout {
+        background-color: #d32f2f;
+        color: white;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease;
+      }
+
+      .greeting-container .logout:hover {
+        background-color: #b71c1c;
+      }
+
+      /* Footer Styles */
+      footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #3b82f6;
+        color: white;
+        margin-top: 20px;
+        width: 100%;
+      }
+
+      .content {
+        flex-grow: 1;
+      }
+
+      /* Services Grid */
+      #servicesGrid {
+        padding: 3rem;
+      }
+
+      .grid a {
+        display: block;
+      }
+
+      .grid div {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+      }
+
+      .grid div:hover {
+        transform: scale(1.05);
+      }
+
+      .grid .icon {
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header Section -->
+      <header class="header">
+        <h1>Sanjeevan Medico Traders</h1>
+      </header>
+
+      <div class="greeting-container">
+        <div class="greeting" id="greeting"></div>
+        <div>
+          <button
+            class="logout"
+            id="logout-btn"
+            onclick="location.href='/login.html'"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Services Grid -->
+      <div id="servicesGrid" class="container mx-auto px-4 py-8">
+        <h3 class="text-2xl font-semibold mb-6 text-center text-gray-800">
+          Welcome to Task Selector.<br />Please select your task or service.
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          <!-- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"> use this when we will add 4 or more buttons-->
+          <!-- Invoice Generator -->
+          <a href="/invoice.html" class="block">
+            <div>
+              <div
+                class="icon bg-blue-100 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center"
+              >
+                <svg
+                  class="w-12 h-12 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800">
+                Invoice Generator
+              </h3>
+            </div>
+          </a>
+
+          <!-- Checking -->
+          <a href="/itemcheck.html" class="block">
+            <div>
+              <div
+                class="icon bg-green-100 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center"
+              >
+                <svg
+                  class="w-12 h-12 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800">Checking</h3>
+            </div>
+          </a>
+
+          <!-- Packaging -->
+          <a href="/itempacking.html" class="block">
+            <div>
+              <div
+                class="icon bg-purple-100 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center"
+              >
+                <svg
+                  class="w-12 h-12 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800">Packaging</h3>
+            </div>
+          </a>
+
+          <!-- Delivery -->
+          <a href="/itemdeliver.html" class="block">
+            <div>
+              <div
+                class="icon bg-yellow-100 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center"
+              >
+                <svg
+                  class="w-12 h-12 text-yellow-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800">Delivery</h3>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; Sanjeevan Medico Traders, <span id="current-year"></span></p>
+    </footer>
+
+    <script>
+      // Update the current year dynamically in the footer
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+      async function updateGreeting() {
+        const now = new Date();
+        const hour = now.getHours();
+        const greetingEl = document.getElementById("greeting");
+
+        let greeting = "Good Evening, ";
+        if (hour < 12) {
+          greeting = "Good Morning, ";
+        } else if (hour < 18) {
+          greeting = "Good Afternoon, ";
+        }
+
+        try {
+          // Attempt to fetch the user's name from localStorage
+          const userData = localStorage.getItem("user");
+          const userName = userData ? JSON.parse(userData).name : "Employee";
+          greetingEl.textContent = greeting + userName;
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          greetingEl.textContent = greeting + "Employee"; // Fallback to "Employee"
+        }
+      }
+
+      window.onload = () => {
+        updateGreeting();
+      };
+
+      let recordCount = 0;
+      let currentInvoiceNo = null;
+    </script>
+  </body>
+</html>
