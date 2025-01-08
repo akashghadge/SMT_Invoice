@@ -31,7 +31,7 @@ app.use(express.static("client"));
 const path = require("path");
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "login.html"));
+  res.sendFile(path.join(__dirname, "client", "admin-dashboard.html"));
 });
 
 app.listen(port, () => {
