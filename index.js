@@ -21,17 +21,18 @@ const verify = require("./verify");
 // api routers
 const User = require("./routes/User.route");
 const Code = require("./routes/Code.route");
+const Record = require("./routes/Record.route");
 
 // routes setting
 app.use("/api/user", User);
 app.use("/api/code", verify, Code);
-
+app.use('/api/record/', Record);
 // for production use
 app.use(express.static("client"));
 const path = require("path");
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "admin-dashboard.html"));
+  res.sendFile(path.join(__dirname, "client", "invoice.html"));
 });
 
 app.listen(port, () => {

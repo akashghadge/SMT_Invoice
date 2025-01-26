@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const packedListSchema = new mongoose.Schema({
     records: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Record' }], // Array of Record references
 });

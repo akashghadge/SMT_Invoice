@@ -1,816 +1,1089 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice Management - Sanjeevan Medico Traders</title>
-    <link rel="stylesheet" href="styles.css" />
-    <!-- SweetAlert2 for confirmation dialogs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --primary-color: #3b82f6;
-        --secondary-color: #3b82f6;
-        --accent-color: #2a77f3;
-        --background-color: #ecf0f1;
-        --text-color: #333;
-        --white: #ffffff;
-        --error-color: #e74c3c;
-        --highlight-color: #fff3cd;
-        --error-border: #dc3545;
-      }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Invoice Management - Sanjeevan Medico Traders</title>
+	<link rel="stylesheet" href="styles.css" />
+	<!-- SweetAlert2 for confirmation dialogs -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.min.css" rel="stylesheet" />
+	<style>
+		:root {
+			--primary-color: #3b82f6;
+			--secondary-color: #3b82f6;
+			--accent-color: #2a77f3;
+			--background-color: #ecf0f1;
+			--text-color: #333;
+			--white: #ffffff;
+			--error-color: #e74c3c;
+			--highlight-color: #fff3cd;
+			--error-border: #dc3545;
+		}
 
-      body {
-        background-color: var(--background-color);
-        color: var(--text-color);
-        line-height: 1.6;
-        font-family: system-ui, -apple-system, sans-serif;
-      }
+		s * {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
 
-      .header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
+		body {
+			background-color: var(--background-color);
+			color: var(--text-color);
+			line-height: 1.6;
+			font-family: system-ui, -apple-system, sans-serif;
+		}
 
-      .header h1 {
-        font-size: 2.25rem;
-        font-weight: bold;
-      }
+		.header {
+			background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+			color: white;
+			padding: 2rem;
+			text-align: center;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
 
-      .greeting-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: linear-gradient(to right, #616161, #757575);
-        color: white;
-        font-size: 1rem;
-      }
+		.header h1 {
+			font-size: 2.25rem;
+			font-weight: bold;
+		}
 
-      .greeting-container .logout {
-        background-color: #d32f2f;
-        color: white;
-        border: none;
-        padding: 8px;
-        cursor: pointer;
-        border-radius: 8px;
-        font-size: 0.9em;
-        transition: background-color 0.3s ease;
-      }
+		.greeting-container {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem;
+			background: linear-gradient(to right, #616161, #757575);
+			color: white;
+			font-size: 1rem;
+		}
 
-      .greeting-container .logout:hover {
-        background-color: #b71c1c;
-      }
+		.greeting-container .logout {
+			background-color: #d32f2f;
+			color: white;
+			border: none;
+			padding: 8px;
+			cursor: pointer;
+			border-radius: 8px;
+			font-size: 0.9em;
+			transition: background-color 0.3s ease;
+		}
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
+		.greeting-container .logout:hover {
+			background-color: #b71c1c;
+		}
 
-      .date-invoice-section {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
 
-      .control-group {
-        margin-bottom: 15px;
-      }
+		.date-invoice-section {
+			background: white;
+			padding: 20px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
 
-      .control-group label {
-        display: block;
-        margin-bottom: 5px;
-        color: var(--text-color);
-        font-weight: 500;
-      }
+		.control-group {
+			margin-bottom: 15px;
+		}
 
-      input[type="date"],
-      input[type="text"] {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d1d1;
-        border-radius: 4px;
-        transition: border-color 0.3s ease;
-      }
+		.control-group label {
+			display: block;
+			margin-bottom: 5px;
+			color: var(--text-color);
+			font-weight: 500;
+		}
 
-      .table-wrapper {
-        overflow-x: auto;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+		input[type="date"],
+		input[type="text"] {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #d1d1d1;
+			border-radius: 4px;
+			transition: border-color 0.3s ease;
+		}
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
+		.table-wrapper {
+			overflow-x: auto;
+			background: white;
+			border-radius: 8px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
 
-      th,
-      td {
-        padding: 12px;
-        border: 1px solid #e0e0e0;
-        text-align: center;
-      }
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
 
-      th {
-        background-color: var(--secondary-color);
-        color: var(--white);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
+		th,
+		td {
+			padding: 12px;
+			border: 1px solid #e0e0e0;
+			text-align: center;
+		}
 
-      .highlighted {
-        background-color: var(--highlight-color);
-      }
+		th {
+			background-color: var(--secondary-color);
+			color: var(--white);
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
 
-      .error-field {
-        border: 2px solid var(--error-border) !important;
-      }
+		.highlighted {
+			background-color: var(--highlight-color);
+		}
 
-      .btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        font-weight: 500;
-      }
+		.error-field {
+			border: 2px solid var(--error-border) !important;
+		}
 
-      .btn-save {
-        background-color: var(--accent-color);
-        color: white;
-      }
+		.btn {
+			padding: 8px 16px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+			font-weight: 500;
+		}
 
-      .btn-reset {
-        background-color: #dc3545;
-        color: white;
-      }
+		.btn-save {
+			background-color: var(--accent-color);
+			color: white;
+		}
 
-      .btn-view {
-        background-color: #28a745;
-        color: white;
-      }
+		.btn-reset {
+			background-color: #dc3545;
+			color: white;
+		}
 
-      .custom-file-upload {
-        display: inline-block;
-        padding: 8px 16px;
-        cursor: pointer;
-        background-color: #6c757d;
-        color: white;
-        border-radius: 4px;
-        transition: background-color 0.3s ease;
-      }
+		.btn-view {
+			background-color: #28a745;
+			color: white;
+		}
 
-      .custom-file-upload:hover {
-        background-color: #5a6268;
-      }
+		.custom-file-upload {
+			display: inline-block;
+			padding: 8px 16px;
+			cursor: pointer;
+			background-color: #6c757d;
+			color: white;
+			border-radius: 4px;
+			transition: background-color 0.3s ease;
+		}
 
-      .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-      }
+		.custom-file-upload:hover {
+			background-color: #5a6268;
+		}
 
-      .pagination button {
-        padding: 8px 16px;
-        border: 1px solid var(--accent-color);
-        background: white;
-        color: var(--accent-color);
-        border-radius: 4px;
-        cursor: pointer;
-      }
+		.pagination {
+			display: flex;
+			justify-content: center;
+			gap: 10px;
+			margin-top: 20px;
+			flex-wrap: wrap;
+		}
 
-      .pagination button.active {
-        background: var(--accent-color);
-        color: white;
-      }
+		.pagination button {
+			padding: 8px 16px;
+			border: 1px solid var(--accent-color);
+			background: white;
+			color: var(--accent-color);
+			border-radius: 4px;
+			cursor: pointer;
+		}
 
-      /* Modal Styles */
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        z-index: 1000;
-      }
+		.pagination button.active {
+			background: var(--accent-color);
+			color: white;
+		}
 
-      .modal-content {
-        position: relative;
-        background-color: white;
-        margin: 20px auto;
-        padding: 20px;
-        width: 90%;
-        max-width: 800px;
-        border-radius: 8px;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-      }
+		/* Modal Styles */
+		.modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.7);
+			z-index: 1000;
+		}
 
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      }
+		.modal-content {
+			position: relative;
+			background-color: white;
+			margin: 20px auto;
+			padding: 20px;
+			width: 90%;
+			max-width: 800px;
+			border-radius: 8px;
+			max-height: 90vh;
+			display: flex;
+			flex-direction: column;
+		}
 
-      .modal-buttons {
-        display: flex;
-        gap: 10px;
-      }
+		.modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 15px;
+		}
 
-      .modal-body {
-        overflow-y: auto;
-        flex-grow: 1;
-      }
+		.modal-buttons {
+			display: flex;
+			gap: 10px;
+		}
 
-      .modal-body img {
-        max-width: 100%;
-        height: auto;
-      }
+		.modal-body {
+			overflow-y: auto;
+			flex-grow: 1;
+		}
 
-      /* Responsive Design */
-      @media (max-width: 768px) {
-        .header h1 {
-          font-size: 1.8rem;
-        }
+		.modal-body img {
+			max-width: 100%;
+			height: auto;
+		}
 
-        .container {
-          padding: 10px;
-        }
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.header h1 {
+				font-size: 1.8rem;
+			}
 
-        th,
-        td {
-          padding: 8px;
-          font-size: 0.9rem;
-        }
+			.container {
+				padding: 10px;
+			}
 
-        .btn {
-          padding: 6px 12px;
-          font-size: 0.9rem;
-        }
+			th,
+			td {
+				padding: 8px;
+				font-size: 0.9rem;
+			}
 
-        .custom-file-upload {
-          padding: 6px 12px;
-          font-size: 0.9rem;
-        }
-      }
+			.btn {
+				padding: 6px 12px;
+				font-size: 0.9rem;
+			}
 
-      @media (max-width: 480px) {
-        .header h1 {
-          font-size: 1.5rem;
-        }
+			.custom-file-upload {
+				padding: 6px 12px;
+				font-size: 0.9rem;
+			}
+		}
 
-        .table-wrapper {
-          font-size: 0.8rem;
-        }
+		@media (max-width: 480px) {
+			.header h1 {
+				font-size: 1.5rem;
+			}
 
-        .btn {
-          padding: 4px 8px;
-          font-size: 0.8rem;
-        }
-      }
+			.table-wrapper {
+				font-size: 0.8rem;
+			}
 
-      /* CSS for Checkbox */
-      .otc-checkbox-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+			.btn {
+				padding: 4px 8px;
+				font-size: 0.8rem;
+			}
+		}
 
-      .otc-checkbox {
-        display: none; /* Hide the default checkbox */
-      }
+		/* CSS for Checkbox */
+		.otc-checkbox-wrapper {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 
-      .custom-checkbox-label {
-        width: 22px;
-        height: 22px;
-        border: 2px solid #ccc;
-        border-radius: 6px;
-        display: inline-block;
-        cursor: pointer;
-        transition: background-color 0.3s ease, border-color 0.3s ease,
-          box-shadow 0.3s ease;
-        position: relative;
-        background-color: white;
-      }
+		.otc-checkbox {
+			display: none;
+			/* Hide the default checkbox */
+		}
 
-      .custom-checkbox-label:hover {
-        border-color: #007bff;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-      }
+		.custom-checkbox-label {
+			width: 22px;
+			height: 22px;
+			border: 2px solid #ccc;
+			border-radius: 6px;
+			display: inline-block;
+			cursor: pointer;
+			transition: background-color 0.3s ease, border-color 0.3s ease,
+				box-shadow 0.3s ease;
+			position: relative;
+			background-color: white;
+		}
 
-      .otc-checkbox:checked + .custom-checkbox-label {
-        background-color: #007bff;
-        border-color: #007bff;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.75);
-      }
+		.custom-checkbox-label:hover {
+			border-color: #007bff;
+			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+		}
 
-      .otc-checkbox:checked + .custom-checkbox-label::after {
-        content: "✔";
-        color: white;
-        font-size: 14px;
-        font-weight: bold;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-    </style>
-  </head>
-  <body>
-    <header class="header">
-      <h1>Sanjeevan Medico Traders</h1>
-    </header>
+		.otc-checkbox:checked+.custom-checkbox-label {
+			background-color: #007bff;
+			border-color: #007bff;
+			box-shadow: 0 0 5px rgba(0, 123, 255, 0.75);
+		}
 
-    <div class="greeting-container">
-      <div class="greeting" id="greeting"></div>
-      <div>
-        <button
-          class="logout"
-          id="logout-btn"
-          onclick="location.href='/login.html'"
-        >
-          Logout
-        </button>
-      </div>
-    </div>
+		.otc-checkbox:checked+.custom-checkbox-label::after {
+			content: "✔";
+			color: white;
+			font-size: 14px;
+			font-weight: bold;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+	</style>
+</head>
 
-    <div class="container">
-      <div id="dateInvoiceControls" class="controls date-invoice-section">
-        <h2>Add Invoice</h2>
-        <div class="control-group">
-          <label for="globalDate">Select Date</label>
-          <input type="date" id="globalDate" />
-        </div>
-        <div class="control-group">
-          <label for="startInvoice">Start Invoice Number</label>
-          <input type="text" id="startInvoice" placeholder="--" />
-        </div>
-      </div>
+<body>
+	<header class="header">
+		<h1>Sanjeevan Medico Traders</h1>
+	</header>
 
-      <div class="table-section">
-        <div class="table-wrapper">
-          <table id="invoiceTable">
-            <thead>
-              <tr>
-                <th>SR</th>
-                <th>Date</th>
-                <th>Invoice No.</th>
-                <th>Party Code</th>
-                <th>Image 1</th>
-                <th>Image 2</th>
-                <th>Save</th>
-                <th>Reset</th>
-                <th>OTC</th>
-                <th>Timestamp</th>
-              </tr>
-            </thead>
+	<div class="greeting-container">
+		<div class="greeting" id="greeting"></div>
+		<div>
+			<button class="logout" id="logout-btn" onclick="location.href='/login.html'">
+				Logout
+			</button>
+		</div>
+	</div>
 
-            <tbody id="invoiceBody"></tbody>
-          </table>
-        </div>
-        <div class="pagination" id="pagination"></div>
-      </div>
-    </div>
+	<div class="container">
+		<div id="dateInvoiceControls" class="controls date-invoice-section">
+			<h2>Add Invoice</h2>
+			<div class="control-group">
+				<label for="globalDate">Select Date</label>
+				<input type="date" id="globalDate" />
+			</div>
+			<div class="control-group">
+				<label for="startInvoice">Start Invoice Number</label>
+				<input type="number" id="startInvoice" placeholder="Enter start invoice number" />
+				<button id="setInvoiceButton">Set This Number</button>
+			</div>
+		</div>
 
-    <!-- Image Preview Modal -->
-    <div id="imageModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Image Preview</h2>
-          <div class="modal-buttons">
-            <button class="btn btn-download" id="downloadBtn">Download</button>
-            <button class="btn btn-close" id="closeModal">Close</button>
-          </div>
-        </div>
-        <div class="modal-body">
-          <img id="previewImage" src="" alt="Preview" />
-        </div>
-      </div>
-    </div>
+		<div class="table-section">
+			<div class="table-wrapper">
+				<table id="invoiceTable">
+					<thead>
+						<tr>
+							<th>SR</th>
+							<th>Date</th>
+							<th>Invoice No.</th>
+							<th>Party Code</th>
+							<th>Image 1</th>
+							<th>Image 2</th>
+							<th>Save</th>
+							<th>Reset</th>
+							<th>OTC</th>
+							<th>Timestamp</th>
+						</tr>
+					</thead>
 
-    <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
+					<tbody id="invoiceBody"></tbody>
+				</table>
+			</div>
+			<div class="pagination" id="pagination"></div>
+		</div>
+	</div>
 
-    <script>
-      // Constants and Global Variables
-      const rowsPerPage = 100;
-      let currentPage = 1;
-      let totalRows = 300;
-      let currentImageFile = null;
+	<!-- Image Preview Modal -->
+	<div id="imageModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>Image Preview</h2>
+				<div class="modal-buttons">
+					<button class="btn btn-download" id="downloadBtn">Download</button>
+					<button class="btn btn-close" id="closeModal">Close</button>
+				</div>
+			</div>
+			<div class="modal-body">
+				<img id="previewImage" src="" alt="Preview" />
+			</div>
+		</div>
+	</div>
 
-      // DOM Elements
-      const modal = document.getElementById("imageModal");
-      const modalImg = document.getElementById("previewImage");
-      const downloadBtn = document.getElementById("downloadBtn");
-      const globalDateInput = document.getElementById("globalDate");
-      const startInvoiceInput = document.getElementById("startInvoice");
+	<script src="script.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.12/sweetalert2.all.min.js"></script>
 
-      // Initialize with default values
-      globalDateInput.valueAsDate = new Date();
+	<script>
+		/*
+			API CALLS
+		*/
+		document.getElementById("setInvoiceButton").addEventListener("click", async () => {
+			const startInvoice = document.getElementById("startInvoice").value;
+			const date = document.getElementById("globalDate").value;
+			if (!startInvoice || !date) {
+				Swal.fire({ icon: "error", title: "Error", text: "Date and Start Invoice are required!" });
+				return;
+			}
+			try {
+				const res = await fetch("/api/record/daily-records/generate/add", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ date, startInvoiceNumber: parseInt(startInvoice), records: [] }),
+				});
+				const data = await res.json();
+				if (!res.ok) {
+					Swal.fire({ icon: "error", title: "Error", text: data.message || "Failed to set invoice number." });
+				} else {
+					Swal.fire({ icon: "success", title: "Success", text: data.message });
+					let processedRows = processRows(data.data);
+					updateTable(processedRows || [], data.data.startInvoiceNumber); // Update table if needed
+				}
+			} catch (err) {
+				console.error(err);
+				Swal.fire({ icon: "error", title: "Error", text: "Internal server error." });
+			}
+		});
 
-      // Utility Functions
-      function formatDate(date) {
-        const d = new Date(date);
-        return `${d.getDate().toString().padStart(2, "0")}-${(d.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}-${d.getFullYear()}`;
-      }
 
-      function createRow(index) {
-        const startInvoice = startInvoiceInput.value;
-        const date = globalDateInput.value;
-        const invoiceNo =
-          startInvoice !== "- -"
-            ? String(Number(startInvoice) + index).padStart(
-                startInvoice.length,
-                "0"
-              )
-            : "- -";
+		window.onload = () => {
+			const tableBody = document.getElementById("invoiceBody");
+			const dateInput = document.getElementById("globalDate");
+			const startInvoiceGroup = document.getElementById("dateInvoiceControls"); // Section containing input and button
 
-        return `
-    <tr class="highlighted" data-row="${index + 1}">
-      <td>${index + 1}</td>
-      <td>${formatDate(date)}</td>
-      <td>${invoiceNo}</td>
-      <td>
-        <input type="text" class="party-code" placeholder="Enter Party Code">
-      </td>
-      <td>
-        <div class="image-upload-container">
-          <label class="custom-file-upload">
-            <input type="file" class="image1" accept="image/*" required style="display: none;">
-            Upload Image 1
-          </label>
-          <button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
-        </div>
-      </td>
-      <td>
-        <div class="image-upload-container">
-          <label class="custom-file-upload">
-            <input type="file" class="image2" accept="image/*" style="display: none;">
-            Upload Image 2
-          </label>
-          <button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
-        </div>
-      </td>
-      <td>
-        <button class="btn btn-save" onclick="saveRow(this)">Save</button>
-      </td>
-      <td>
-        <button class="btn btn-reset" onclick="confirmReset(this)">Reset</button>
-      </td>
-      <td>
-       <div class="otc-checkbox-wrapper">
+			// Set today's date in Indian Standard Time
+			const getIndianDate = () => {
+				const offset = 5.5 * 60 * 60 * 1000; // IST offset
+				return new Date(new Date().getTime() + offset).toISOString().split("T")[0];
+			};
+
+			dateInput.value = getIndianDate();
+
+			async function fetchRecords(date) {
+				try {
+					const res = await fetch("/api/record/daily-records/date", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ date }),
+					});
+					const data = await res.json();
+					tableBody.innerHTML = ""; // Clear table
+
+					if (!res.ok) {
+						// No document for today
+						tableBody.innerHTML = "<tr><td colspan='10'>No records found.</td></tr>";
+						if (date === getIndianDate()) {
+							// Keep the input and button visible for today's date
+							startInvoiceGroup.style.display = "block";
+						}
+					} else {
+						// Document exists, populate the table
+						let processedRows = processRows(data.data);
+						updateTable(processedRows, data.data.startInvoiceNumber);
+
+						if (date === getIndianDate()) {
+							// Hide the input and button for today's date
+							startInvoiceGroup.style.display = "none";
+						}
+					}
+				} catch (err) {
+					console.error(err);
+					tableBody.innerHTML = "<tr><td colspan='10'>Error loading records.</td></tr>";
+				}
+			}
+
+			dateInput.addEventListener("change", (e) => fetchRecords(e.target.value)); // Fetch on date change
+			fetchRecords(dateInput.value); // Initial fetch
+		};
+
+
+
+		function getIndianDate() {
+			const offset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+			return new Date().getTime() + offset;
+		}
+
+		function processRows(data) {
+			let start = data.startInvoiceNumber;
+			let end = data.endInvoiceNumber;
+
+			let isToday = isSameDate(data.date);
+			let rows = [];
+			let quickSearchMap = {};
+			data.records.forEach((row) => {
+				quickSearchMap[row.invoiceNumber] = row;
+			})
+			if (isToday) {
+				// we need minium 300 rows
+				for (let i = start; i <= Math.max(end, start + 49); i++) {
+					let currRow = quickSearchMap[start];
+					if (currRow) {
+						rows.push(quickSearchMap[start]);
+					}
+					else {
+						rows.push({});
+					}
+				}
+			}
+			else {
+				for (let i = start; i <= end; i++) {
+					let currRow = quickSearchMap[start];
+					if (currRow) {
+						rows.push(quickSearchMap[start]);
+					}
+					else {
+						rows.push({});
+					}
+				}
+			}
+			return rows;
+		}
+
+		function isSameDate(apiDate) {
+			const getIndianDate = () => {
+				const offset = 5.5 * 60 * 60 * 1000; // IST offset
+				return new Date(new Date().getTime() + offset);
+			};
+			const today = moment(getIndianDate()).format('YYYY-MM-DD'); // Format the date as "YYYY-MM-DD"
+			apiDate = moment(apiDate).format('YYYY-MM-DD');
+			return apiDate === today;
+		}
+		function isEmpty(obj) {
+			for (const prop in obj) {
+				if (Object.hasOwn(obj, prop)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		function saveRow(button) {
+			const row = button.closest("tr");
+			if (!validateRow(row)) {
+				return;
+			}
+			const partyCode = row.querySelector(".party-code");
+			const image1 = row.querySelector(".image1");
+			let imageData = image1.files[0];
+			let formData = getFormData(imageData);
+			PostImage(formData)
+				.then((res) => res.json())
+				.then((data) => {
+					console.log(partyCode.value, data.url);
+				})
+				.catch((err) => {
+					console.log(err);
+				})
+
+		}
+		async function PostImage(formdata) {
+			return fetch("https://api.cloudinary.com/v1_1/asghadge/image/upload", {
+				method: "post",
+				body: formdata
+			})
+		}
+
+		function getFormData(photo) {
+			let formdata = new FormData();
+			formdata.append("file", photo);
+			formdata.append("upload_preset", "social-media");
+			formdata.append("cloud_name", "asghadge");
+			return formdata;
+		}
+
+		function validateRow(row) {
+			const partyCode = row.querySelector(".party-code");
+			const image1 = row.querySelector(".image1");
+			let isValid = true;
+
+			// Reset previous error states
+			partyCode.classList.remove("error-field");
+			image1.closest(".custom-file-upload").classList.remove("error-field");
+
+			if (!partyCode.value) {
+				partyCode.classList.add("error-field");
+				isValid = false;
+			}
+
+			if (!image1.files.length) {
+				image1.closest(".custom-file-upload").classList.add("error-field");
+				isValid = false;
+			}
+
+			return isValid;
+		}
+
+
+		function updateTable(rows, startIndex) {
+			const date = document.getElementById("globalDate").value;
+			const tableBody = document.getElementById("invoiceBody");
+			tableBody.innerHTML = ""; // Clear existing rows
+			rows.forEach((r, i) => {
+				if (isEmpty(r)) {
+					const row = `
+					<tr class="highlighted" data-row="${i + 1}">
+					<td>${i + 1}</td>
+					<td>${moment(date).format('DD-MM-YYYY')}</td>
+					<td>${startIndex + i}</td>
+					<td>
+						<input type="text" class="party-code" placeholder="Enter Party Code">
+					</td>
+					<td>
+						<div class="image-upload-container">
+						<label class="custom-file-upload">
+							<input type="file" class="image1" accept="image/*" required style="display: none;">
+							Upload
+						</label>
+						<button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
+						</div>
+					</td>
+					<td>
+						<div class="image-upload-container">
+						<label class="custom-file-upload">
+							<input type="file" class="image2" accept="image/*" style="display: none;">
+							Upload
+						</label>
+						<button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
+						</div>
+					</td>
+					<td>
+						<button class="btn btn-save" onclick="saveRow(this)">Save</button>
+					</td>
+					<td>
+						<button class="btn btn-reset" onclick="confirmReset(this)">Reset</button>
+					</td>
+					<td>
+					<div class="otc-checkbox-wrapper">
+				<input type="checkbox" id="otc-checkbox" class="otc-checkbox">
+				<label for="otc-checkbox" class="custom-checkbox-label"></label>
+				</div>
+					</td>
+					<td class="timestamp"></td>
+					</tr>
+					`;
+					tableBody.innerHTML += row;
+				}
+				else {
+					const row = `<tr>
+						<td>${i + 1}</td>
+						<td>${moment(r.date).format('DD-MM-YYYY')}</td>
+						<td>${r.invoiceNo || "-"}</td>
+						<td>${r.partyCode || "-"}</td>
+						<td><button class="btn-view" onclick="viewImage('${r.image1}')">View</button></td>
+						<td><button class="btn-view" onclick="viewImage('${r.image2}')">View</button></td>
+						<td><button class="btn-save">Save</button></td>
+						<td><button class="btn-reset">Reset</button></td>
+						<td class="otc-checkbox-wrapper">
+							<input type="checkbox" class="otc-checkbox" id="otc-${i}" ${r.isOtc ? "checked" : ""} />
+							<label for="otc-${i}" class="custom-checkbox-label"></label>
+						</td>
+						<td>${r.timestamp || "-"}</td>
+						</tr>`;
+					tableBody.innerHTML += row;
+				}
+			});
+		}
+
+
+
+
+
+		/*
+		// Constants and Global Variables
+		const rowsPerPage = 100;
+		let currentPage = 1;
+		let totalRows = 300;
+		let currentImageFile = null;
+
+		// DOM Elements
+		const modal = document.getElementById("imageModal");
+		const modalImg = document.getElementById("previewImage");
+		const downloadBtn = document.getElementById("downloadBtn");
+		const globalDateInput = document.getElementById("globalDate");
+		const startInvoiceInput = document.getElementById("startInvoice");
+
+		// Initialize with default values
+		globalDateInput.valueAsDate = new Date();
+
+		// Utility Functions
+		function formatDate(date) {
+			const d = new Date(date);
+			return `${d.getDate().toString().padStart(2, "0")}-${(d.getMonth() + 1)
+				.toString()
+				.padStart(2, "0")}-${d.getFullYear()}`;
+		}
+
+		function createRow(index) {
+			const startInvoice = startInvoiceInput.value;
+			const date = globalDateInput.value;
+			const invoiceNo =
+				startInvoice !== "- -"
+					? String(Number(startInvoice) + index).padStart(
+						startInvoice.length,
+						"0"
+					)
+					: "- -";
+
+			return `
+	<tr class="highlighted" data-row="${index + 1}">
+	  <td>${index + 1}</td>
+	  <td>${formatDate(date)}</td>
+	  <td>${invoiceNo}</td>
+	  <td>
+		<input type="text" class="party-code" placeholder="Enter Party Code">
+	  </td>
+	  <td>
+		<div class="image-upload-container">
+		  <label class="custom-file-upload">
+			<input type="file" class="image1" accept="image/*" required style="display: none;">
+			Upload Image 1
+		  </label>
+		  <button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
+		</div>
+	  </td>
+	  <td>
+		<div class="image-upload-container">
+		  <label class="custom-file-upload">
+			<input type="file" class="image2" accept="image/*" style="display: none;">
+			Upload Image 2
+		  </label>
+		  <button class="btn btn-view" style="display: none;" onclick="previewImage(this)">View</button>
+		</div>
+	  </td>
+	  <td>
+		<button class="btn btn-save" onclick="saveRow(this)">Save</button>
+	  </td>
+	  <td>
+		<button class="btn btn-reset" onclick="confirmReset(this)">Reset</button>
+	  </td>
+	  <td>
+	   <div class="otc-checkbox-wrapper">
   <input type="checkbox" id="otc-checkbox" class="otc-checkbox">
   <label for="otc-checkbox" class="custom-checkbox-label"></label>
 </div>
-      </td>
-      <td class="timestamp"></td>
-    </tr>
+	  </td>
+	  <td class="timestamp"></td>
+	</tr>
   `;
-      }
+		}
 
-      // Table Management Functions
-      function updateTable() {
-        const tbody = document.getElementById("invoiceBody");
-        tbody.innerHTML = "";
+		// Table Management Functions
+		function updateTable() {
+			const tbody = document.getElementById("invoiceBody");
+			tbody.innerHTML = "";
 
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = Math.min(start + rowsPerPage, totalRows);
+			const start = (currentPage - 1) * rowsPerPage;
+			const end = Math.min(start + rowsPerPage, totalRows);
 
-        for (let i = start; i < end; i++) {
-          tbody.insertAdjacentHTML("beforeend", createRow(i));
-        }
+			for (let i = start; i < end; i++) {
+				tbody.insertAdjacentHTML("beforeend", createRow(i));
+			}
 
-        updatePagination();
-        toggleDateInvoiceControls();
-      }
+			updatePagination();
+			toggleDateInvoiceControls();
+		}
 
-      function updatePagination() {
-        const pagination = document.getElementById("pagination");
-        const pageCount = Math.ceil(totalRows / rowsPerPage);
+		function updatePagination() {
+			const pagination = document.getElementById("pagination");
+			const pageCount = Math.ceil(totalRows / rowsPerPage);
 
-        let html = "";
-        for (let i = 1; i <= pageCount; i++) {
-          html += `
-              <button class="${i === currentPage ? "active" : ""}"
-                      onclick="changePage(${i})">${i}</button>
-            `;
-        }
+			let html = "";
+			for (let i = 1; i <= pageCount; i++) {
+				html += `
+			  <button class="${i === currentPage ? "active" : ""}"
+					  onclick="changePage(${i})">${i}</button>
+			`;
+			}
 
-        if (currentPage === pageCount) {
-          html += `
-              <button class="add-more-btn" onclick="addMore()">Add More</button>
-            `;
-        }
+			if (currentPage === pageCount) {
+				html += `
+			  <button class="add-more-btn" onclick="addMore()">Add More</button>
+			`;
+			}
 
-        pagination.innerHTML = html;
-      }
+			pagination.innerHTML = html;
+		}
 
-      function toggleDateInvoiceControls() {
-        const controls = document.getElementById("dateInvoiceControls");
-        controls.style.display = currentPage === 1 ? "block" : "none";
-      }
+		function toggleDateInvoiceControls() {
+			const controls = document.getElementById("dateInvoiceControls");
+			controls.style.display = currentPage === 1 ? "block" : "none";
+		}
 
-      function changePage(page) {
-        currentPage = page;
-        updateTable();
-      }
+		function changePage(page) {
+			currentPage = page;
+			updateTable();
+		}
 
-      function addMore() {
-        totalRows += 1; // Increment total rows by 1
-        const tbody = document.getElementById("invoiceBody");
-        const newRowIndex = totalRows - 1; // Index of the new row
+		function addMore() {
+			totalRows += 1; // Increment total rows by 1
+			const tbody = document.getElementById("invoiceBody");
+			const newRowIndex = totalRows - 1; // Index of the new row
 
-        // Add the new row at the end of the table
-        tbody.insertAdjacentHTML("beforeend", createRow(newRowIndex));
+			// Add the new row at the end of the table
+			tbody.insertAdjacentHTML("beforeend", createRow(newRowIndex));
 
-        updatePagination(); // Refresh pagination to ensure it remains consistent
-      }
+			updatePagination(); // Refresh pagination to ensure it remains consistent
+		}
 
-      // Row Management Functions
-      function validateRow(row) {
-        const partyCode = row.querySelector(".party-code");
-        const image1 = row.querySelector(".image1");
-        let isValid = true;
+		// Row Management Functions
+		function validateRow(row) {
+			const partyCode = row.querySelector(".party-code");
+			const image1 = row.querySelector(".image1");
+			let isValid = true;
 
-        // Reset previous error states
-        partyCode.classList.remove("error-field");
-        image1.closest(".custom-file-upload").classList.remove("error-field");
+			// Reset previous error states
+			partyCode.classList.remove("error-field");
+			image1.closest(".custom-file-upload").classList.remove("error-field");
 
-        if (!partyCode.value) {
-          partyCode.classList.add("error-field");
-          isValid = false;
-        }
+			if (!partyCode.value) {
+				partyCode.classList.add("error-field");
+				isValid = false;
+			}
 
-        if (!image1.files.length) {
-          image1.closest(".custom-file-upload").classList.add("error-field");
-          isValid = false;
-        }
+			if (!image1.files.length) {
+				image1.closest(".custom-file-upload").classList.add("error-field");
+				isValid = false;
+			}
 
-        return isValid;
-      }
-      function addMore() {
-        totalRows++;
-        updateTable();
-      }
-      function saveRow(btn) {
-        const row = btn.closest("tr");
+			return isValid;
+		}
+		function addMore() {
+			totalRows++;
+			updateTable();
+		}
+		function saveRow(btn) {
+			const row = btn.closest("tr");
 
-        if (!validateRow(row)) {
-          return;
-        }
+			if (!validateRow(row)) {
+				return;
+			}
 
-        // Check if OTC checkbox is checked
-        const otcCheckbox = row.querySelector(".otc-checkbox");
-        if (otcCheckbox.checked) {
-          Swal.fire({
-            title: "Warning!",
-            text: "You have marked this invoice as OTC.",
-            icon: "warning",
-            confirmButtonText: "OK",
-          });
-        }
+			// Check if OTC checkbox is checked
+			const otcCheckbox = row.querySelector(".otc-checkbox");
+			if (otcCheckbox.checked) {
+				Swal.fire({
+					title: "Warning!",
+					text: "You have marked this invoice as OTC.",
+					icon: "warning",
+					confirmButtonText: "OK",
+				});
+			}
 
-        // Update timestamp
-        const timestamp = new Date().toLocaleString();
-        row.querySelector(".timestamp").textContent = timestamp;
+			// Update timestamp
+			const timestamp = new Date().toLocaleString();
+			row.querySelector(".timestamp").textContent = timestamp;
 
-        // Show view buttons if files are selected
-        const image1Container = row
-          .querySelector(".image1")
-          .closest(".image-upload-container");
-        const image2Container = row
-          .querySelector(".image2")
-          .closest(".image-upload-container");
+			// Show view buttons if files are selected
+			const image1Container = row
+				.querySelector(".image1")
+				.closest(".image-upload-container");
+			const image2Container = row
+				.querySelector(".image2")
+				.closest(".image-upload-container");
 
-        if (row.querySelector(".image1").files.length) {
-          image1Container.querySelector(".btn-view").style.display =
-            "inline-block";
-        }
+			if (row.querySelector(".image1").files.length) {
+				image1Container.querySelector(".btn-view").style.display =
+					"inline-block";
+			}
 
-        if (row.querySelector(".image2").files.length) {
-          image2Container.querySelector(".btn-view").style.display =
-            "inline-block";
-        }
+			if (row.querySelector(".image2").files.length) {
+				image2Container.querySelector(".btn-view").style.display =
+					"inline-block";
+			}
 
-        // Remove highlighting
-        row.classList.remove("highlighted");
-      }
+			// Remove highlighting
+			row.classList.remove("highlighted");
+		}
 
-      async function confirmReset(btn) {
-        const result = await Swal.fire({
-          title: "Are you sure?",
-          text: "This will clear all data in this row. This action cannot be undone!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#dc3545",
-          cancelButtonColor: "#6c757d",
-          confirmButtonText: "Clear Row",
-        });
+		async function confirmReset(btn) {
+			const result = await Swal.fire({
+				title: "Are you sure?",
+				text: "This will clear all data in this row. This action cannot be undone!",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#dc3545",
+				cancelButtonColor: "#6c757d",
+				confirmButtonText: "Clear Row",
+			});
 
-        if (result.isConfirmed) {
-          resetRow(btn);
-        }
-      }
+			if (result.isConfirmed) {
+				resetRow(btn);
+			}
+		}
 
-      function resetRow(btn) {
-        const row = btn.closest("tr");
+		function resetRow(btn) {
+			const row = btn.closest("tr");
 
-        // Reset all inputs
-        row.querySelector(".party-code").value = "";
-        row.querySelector(".image1").value = "";
-        row.querySelector(".image2").value = "";
+			// Reset all inputs
+			row.querySelector(".party-code").value = "";
+			row.querySelector(".image1").value = "";
+			row.querySelector(".image2").value = "";
 
-        // Hide view buttons
-        row
-          .querySelectorAll(".btn-view")
-          .forEach((btn) => (btn.style.display = "none"));
+			// Hide view buttons
+			row
+				.querySelectorAll(".btn-view")
+				.forEach((btn) => (btn.style.display = "none"));
 
-        // Reset timestamp
-        row.querySelector(".timestamp").textContent = "";
+			// Reset timestamp
+			row.querySelector(".timestamp").textContent = "";
 
-        // Add highlighting
-        row.classList.add("highlighted");
+			// Add highlighting
+			row.classList.add("highlighted");
 
-        // Remove any error states
-        row
-          .querySelectorAll(".error-field")
-          .forEach((el) => el.classList.remove("error-field"));
-      }
+			// Remove any error states
+			row
+				.querySelectorAll(".error-field")
+				.forEach((el) => el.classList.remove("error-field"));
+		}
 
-      // Image Management Functions
-      function previewImage(btn) {
-        const row = btn.closest("tr");
-        const imageInput = btn
-          .closest(".image-upload-container")
-          .querySelector('input[type="file"]');
-        const file = imageInput.files[0];
+		// Image Management Functions
+		function previewImage(btn) {
+			const row = btn.closest("tr");
+			const imageInput = btn
+				.closest(".image-upload-container")
+				.querySelector('input[type="file"]');
+			const file = imageInput.files[0];
 
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            modalImg.src = e.target.result;
-            currentImageFile = file;
-            modal.style.display = "block";
-          };
-          reader.readAsDataURL(file);
-        }
-      }
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					modalImg.src = e.target.result;
+					currentImageFile = file;
+					modal.style.display = "block";
+				};
+				reader.readAsDataURL(file);
+			}
+		}
 
-      function handleFileInputChange(e) {
-        if (e.target.matches('input[type="file"]')) {
-          const container = e.target.closest(".image-upload-container");
-          const viewBtn = container.querySelector(".btn-view");
-          viewBtn.style.display = e.target.files.length
-            ? "inline-block"
-            : "none";
-        }
-      }
+		function handleFileInputChange(e) {
+			if (e.target.matches('input[type="file"]')) {
+				const container = e.target.closest(".image-upload-container");
+				const viewBtn = container.querySelector(".btn-view");
+				viewBtn.style.display = e.target.files.length
+					? "inline-block"
+					: "none";
+			}
+		}
 
-      // Event Listeners
-      document.getElementById("closeModal").onclick = function () {
-        modal.style.display = "none";
-      };
+		// Event Listeners
+		document.getElementById("closeModal").onclick = function () {
+			modal.style.display = "none";
+		};
 
-      downloadBtn.onclick = function () {
-        if (currentImageFile) {
-          const url = URL.createObjectURL(currentImageFile);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = currentImageFile.name;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      };
+		downloadBtn.onclick = function () {
+			if (currentImageFile) {
+				const url = URL.createObjectURL(currentImageFile);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = currentImageFile.name;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+			}
+		};
 
-      window.onclick = function (event) {
-        if (event.target === modal) {
-          modal.style.display = "none";
-        }
-      };
+		window.onclick = function (event) {
+			if (event.target === modal) {
+				modal.style.display = "none";
+			}
+		};
 
-      document.addEventListener("change", handleFileInputChange);
-      globalDateInput.addEventListener("change", updateTable);
-      startInvoiceInput.addEventListener("input", updateTable);
+		document.addEventListener("change", handleFileInputChange);
+		globalDateInput.addEventListener("change", updateTable);
+		// startInvoiceInput.addEventListener("input", updateTable);
 
-      // Initialize table
-      updateTable();
-      // Function to save data to localStorage
-      function saveDataToStorage(data) {
-        localStorage.setItem("invoiceData", JSON.stringify(data));
-      }
+		// Initialize table
+		updateTable();
+		// Function to save data to localStorage
+		function saveDataToStorage(data) {
+			localStorage.setItem("invoiceData", JSON.stringify(data));
+		}
 
-      // Function to load data from localStorage
-      function loadDataFromStorage() {
-        const data = localStorage.getItem("invoiceData");
-        return data ? JSON.parse(data) : [];
-      }
+		// Function to load data from localStorage
+		function loadDataFromStorage() {
+			const data = localStorage.getItem("invoiceData");
+			return data ? JSON.parse(data) : [];
+		}
 
-      // Function to render data into the table
-      function renderTable(data) {
-        const tableBody = document.querySelector("#invoiceTable tbody");
-        tableBody.innerHTML = "";
+		// Function to render data into the table
+		function renderTable(data) {
+			const tableBody = document.querySelector("#invoiceTable tbody");
+			tableBody.innerHTML = "";
 
-        data.forEach((row, index) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${row.item}</td>
-            <td>${row.quantity}</td>
-            <td>${row.price}</td>
-            <td>${row.total}</td>
-            <td><button class="delete-row" data-index="${index}">Delete</button></td>
-        `;
-          tableBody.appendChild(tr);
-        });
-      }
+			data.forEach((row, index) => {
+				const tr = document.createElement("tr");
+				tr.innerHTML = `
+			<td>${index + 1}</td>
+			<td>${row.item}</td>
+			<td>${row.quantity}</td>
+			<td>${row.price}</td>
+			<td>${row.total}</td>
+			<td><button class="delete-row" data-index="${index}">Delete</button></td>
+		`;
+				tableBody.appendChild(tr);
+			});
+		}
 
-      // Event listener for adding a new row
-      const addRowButton = document.getElementById("addRow");
-      addRowButton.addEventListener("click", () => {
-        const itemInput = document.getElementById("item");
-        const quantityInput = document.getElementById("quantity");
-        const priceInput = document.getElementById("price");
+		// Event listener for adding a new row
+		const addRowButton = document.getElementById("addRow");
+		addRowButton.addEventListener("click", () => {
+			const itemInput = document.getElementById("item");
+			const quantityInput = document.getElementById("quantity");
+			const priceInput = document.getElementById("price");
 
-        const item = itemInput.value.trim();
-        const quantity = parseFloat(quantityInput.value);
-        const price = parseFloat(priceInput.value);
+			const item = itemInput.value.trim();
+			const quantity = parseFloat(quantityInput.value);
+			const price = parseFloat(priceInput.value);
 
-        if (!item || isNaN(quantity) || isNaN(price)) {
-          alert("Please fill in all fields correctly.");
-          return;
-        }
+			if (!item || isNaN(quantity) || isNaN(price)) {
+				alert("Please fill in all fields correctly.");
+				return;
+			}
 
-        const total = quantity * price;
+			const total = quantity * price;
 
-        const currentData = loadDataFromStorage();
-        currentData.push({ item, quantity, price, total });
-        saveDataToStorage(currentData);
+			const currentData = loadDataFromStorage();
+			currentData.push({ item, quantity, price, total });
+			saveDataToStorage(currentData);
 
-        renderTable(currentData);
+			renderTable(currentData);
 
-        itemInput.value = "";
-        quantityInput.value = "";
-        priceInput.value = "";
-      });
+			itemInput.value = "";
+			quantityInput.value = "";
+			priceInput.value = "";
+		});
 
-      // Event listener for deleting a row
-      const tableBody = document.querySelector("#invoiceTable tbody");
-      tableBody.addEventListener("click", (event) => {
-        if (event.target.classList.contains("delete-row")) {
-          const index = event.target.getAttribute("data-index");
-          const currentData = loadDataFromStorage();
-          currentData.splice(index, 1);
-          saveDataToStorage(currentData);
-          renderTable(currentData);
-        }
-      });
+		// Event listener for deleting a row
+		const tableBody = document.querySelector("#invoiceTable tbody");
+		tableBody.addEventListener("click", (event) => {
+			if (event.target.classList.contains("delete-row")) {
+				const index = event.target.getAttribute("data-index");
+				const currentData = loadDataFromStorage();
+				currentData.splice(index, 1);
+				saveDataToStorage(currentData);
+				renderTable(currentData);
+			}
+		});
 
-      // Initial table rendering
-      document.addEventListener("DOMContentLoaded", () => {
-        const savedData = loadDataFromStorage();
-        renderTable(savedData);
-      });
-      // OTC
-      const otcCheckbox = document.getElementById("otc-checkbox");
+		// Initial table rendering
+		document.addEventListener("DOMContentLoaded", () => {
+			const savedData = loadDataFromStorage();
+			renderTable(savedData);
+		});
+		// OTC
+		const otcCheckbox = document.getElementById("otc-checkbox");
 
-      otcCheckbox.addEventListener("change", function (event) {
-        if (this.checked) {
-          const confirmation = confirm(
-            "By selecting this option, you are marking this order under OTC (On The Counter) order type."
-          );
-          if (!confirmation) {
-            this.checked = false; // Uncheck the checkbox if user cancels
-          }
-        }
-      });
-    </script>
-  </body>
+		otcCheckbox.addEventListener("change", function (event) {
+			if (this.checked) {
+				const confirmation = confirm(
+					"By selecting this option, you are marking this order under OTC (On The Counter) order type."
+				);
+				if (!confirmation) {
+					this.checked = false; // Uncheck the checkbox if user cancels
+				}
+			}
+		});
+		*/
+	</script>
+</body>
+
 </html>
