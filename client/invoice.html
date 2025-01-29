@@ -361,7 +361,7 @@
 				<label for="globalDate">Select Date</label>
 				<input type="date" id="globalDate" />
 			</div>
-			<div class="control-group">
+			<div class="control-group" id="dateInvoiceControlsNumber">
 				<label for="startInvoice">Start Invoice Number</label>
 				<input type="number" id="startInvoice" placeholder="Enter start invoice number" />
 				<button id="setInvoiceButton">Set This Number</button>
@@ -415,8 +415,21 @@
 
 	<script>
 		/*
+			Variables
+		*/
+		const modal = document.getElementById("imageModal");
+		const modalImg = document.getElementById("previewImage");
+		const downloadBtn = document.getElementById("downloadBtn");
+		const globalDateInput = document.getElementById("globalDate");
+		const startInvoiceInput = document.getElementById("startInvoice");
+
+
+
+		/*
 			API CALLS
 		*/
+		let CURRENT_ROWS = [];
+		let START_INVOICE = -1;
 		document.getElementById("setInvoiceButton").addEventListener("click", async () => {
 			const startInvoice = document.getElementById("startInvoice").value;
 			const date = document.getElementById("globalDate").value;
@@ -436,6 +449,8 @@
 				} else {
 					Swal.fire({ icon: "success", title: "Success", text: data.message });
 					let processedRows = processRows(data.data);
+					CURRENT_ROWS = processedRows;
+					START_INVOICE = startInvoiceNumber;
 					updateTable(processedRows || [], data.data.startInvoiceNumber); // Update table if needed
 				}
 			} catch (err) {
@@ -448,7 +463,7 @@
 		window.onload = () => {
 			const tableBody = document.getElementById("invoiceBody");
 			const dateInput = document.getElementById("globalDate");
-			const startInvoiceGroup = document.getElementById("dateInvoiceControls"); // Section containing input and button
+			const startInvoiceGroup = document.getElementById("dateInvoiceControlsNumber"); // Section containing input and button
 
 			// Set today's date in Indian Standard Time
 			const getIndianDate = () => {
@@ -478,7 +493,10 @@
 					} else {
 						// Document exists, populate the table
 						let processedRows = processRows(data.data);
+						CURRENT_ROWS = processedRows;
+						START_INVOICE = data.data.startInvoiceNumber;
 						updateTable(processedRows, data.data.startInvoiceNumber);
+						console.log(data.data);
 
 						if (date === getIndianDate()) {
 							// Hide the input and button for today's date
@@ -515,9 +533,10 @@
 			if (isToday) {
 				// we need minium 300 rows
 				for (let i = start; i <= Math.max(end, start + 49); i++) {
-					let currRow = quickSearchMap[start];
+					let currRow = quickSearchMap[i];
+					console.log(currRow);
 					if (currRow) {
-						rows.push(quickSearchMap[start]);
+						rows.push(quickSearchMap[i]);
 					}
 					else {
 						rows.push({});
@@ -526,9 +545,9 @@
 			}
 			else {
 				for (let i = start; i <= end; i++) {
-					let currRow = quickSearchMap[start];
+					let currRow = quickSearchMap[i];
 					if (currRow) {
-						rows.push(quickSearchMap[start]);
+						rows.push(quickSearchMap[i]);
 					}
 					else {
 						rows.push({});
@@ -555,25 +574,117 @@
 			}
 			return true;
 		}
+
+		async function confirmReset(btn) {
+
+			const result = await Swal.fire({
+				title: "Are you sure?",
+				text: "This will clear all data in this row. This action cannot be undone!",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#dc3545",
+				cancelButtonColor: "#6c757d",
+				confirmButtonText: "Clear Row",
+			});
+
+			if (result.isConfirmed) {
+				resetRow(btn);
+			}
+		}
+
+		async function resetRow(btn) {
+			const row = btn.closest("tr");
+			let invoiceNumberToReset = row.querySelector('td:nth-child(3)').innerText;
+
+			try {
+				// change on server
+				const response = await fetch('/api/record/invoice/reset', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ invoiceNumber: invoiceNumberToReset }),
+				});
+
+				const result = await response.json();
+
+				if (!response.ok) {
+					throw new Error(result.message || 'Error reset invoice');
+				}
+
+				CURRENT_ROWS.forEach((record, i) => {
+					if (record.invoiceNumber == invoiceNumberToReset)
+						CURRENT_ROWS[i] = {};
+				})
+				updateTable(CURRENT_ROWS, START_INVOICE);
+				console.log('Invoice reset successfully:', result.data);
+			} catch (error) {
+				console.error('Error:', error);
+				alert('Failed to reset invoice: ' + error.message);
+			}
+		}
+
+
 		function saveRow(button) {
 			const row = button.closest("tr");
+
 			if (!validateRow(row)) {
 				return;
 			}
-			const partyCode = row.querySelector(".party-code");
+			const date = row.querySelector('td:nth-child(2)').innerText; // Date cell
+			const indexOfRow = row.querySelector('td:nth-child(1)').innerText; // Date cell
+
+			console.log(moment.utc("27-01-2025", "DD-MM-YYYY").startOf('day').toDate());
+
+			const invoiceNumber = row.querySelector('td:nth-child(3)').innerText; // Start Index + i will give the invoice number here
+			const partyCode = row.querySelector(".party-code").value;
 			const image1 = row.querySelector(".image1");
+
 			let imageData = image1.files[0];
 			let formData = getFormData(imageData);
+
 			PostImage(formData)
 				.then((res) => res.json())
-				.then((data) => {
-					console.log(partyCode.value, data.url);
+				.then(async (data) => {
+					const invoiceData = {
+						invoiceNumber: invoiceNumber,
+						generatedDate: moment.utc(date, "DD-MM-YYYY").startOf('day').toDate(),
+						partyCode: partyCode,
+						imageLinks: [data.url],
+					};
+					let latestData = await createInvoice(invoiceData);
+					CURRENT_ROWS[parseInt(indexOfRow) - 1] = latestData;
+					updateTable(CURRENT_ROWS, START_INVOICE);
 				})
 				.catch((err) => {
 					console.log(err);
 				})
 
 		}
+		async function createInvoice(invoiceData) {
+			try {
+				const response = await fetch('/api/record/invoice/create', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(invoiceData),
+				});
+
+				const result = await response.json();
+
+				if (!response.ok) {
+					throw new Error(result.message || 'Error creating invoice');
+				}
+
+				console.log('Invoice created successfully:', result.data);
+				return result.data; // Return the created invoice data
+			} catch (error) {
+				console.error('Error:', error);
+				alert('Failed to create invoice: ' + error.message);
+			}
+		}
+
 		async function PostImage(formdata) {
 			return fetch("https://api.cloudinary.com/v1_1/asghadge/image/upload", {
 				method: "post",
@@ -592,6 +703,7 @@
 		function validateRow(row) {
 			const partyCode = row.querySelector(".party-code");
 			const image1 = row.querySelector(".image1");
+
 			let isValid = true;
 
 			// Reset previous error states
@@ -665,12 +777,16 @@
 					const row = `<tr>
 						<td>${i + 1}</td>
 						<td>${moment(r.date).format('DD-MM-YYYY')}</td>
-						<td>${r.invoiceNo || "-"}</td>
+						<td>${r.invoiceNumber || "-"}</td>
 						<td>${r.partyCode || "-"}</td>
-						<td><button class="btn-view" onclick="viewImage('${r.image1}')">View</button></td>
-						<td><button class="btn-view" onclick="viewImage('${r.image2}')">View</button></td>
-						<td><button class="btn-save">Save</button></td>
-						<td><button class="btn-reset">Reset</button></td>
+						<td><button class="btn btn-view" onclick="viewImage('${r.imageLinks[0]}')">View</button></td>
+						<td><button class="btn btn-view" onclick="viewImage('${r.imageLinks[0]}')">View</button></td>
+						<td>
+							<button class="btn btn-save">Save</button>
+						</td>
+						<td>
+							<button class="btn btn-reset" onclick="confirmReset(this)">Reset</button>
+						</td>
 						<td class="otc-checkbox-wrapper">
 							<input type="checkbox" class="otc-checkbox" id="otc-${i}" ${r.isOtc ? "checked" : ""} />
 							<label for="otc-${i}" class="custom-checkbox-label"></label>
@@ -684,7 +800,68 @@
 
 
 
+		// Image Management Functions
+		function previewImage(btn) {
+			const row = btn.closest("tr");
+			const imageInput = btn
+				.closest(".image-upload-container")
+				.querySelector('input[type="file"]');
+			const file = imageInput.files[0];
 
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					modalImg.src = e.target.result;
+					currentImageFile = file;
+					modal.style.display = "block";
+				};
+				reader.readAsDataURL(file);
+			}
+		}
+
+		function handleFileInputChange(e) {
+			if (e.target.matches('input[type="file"]')) {
+				const container = e.target.closest(".image-upload-container");
+				const viewBtn = container.querySelector(".btn-view");
+				viewBtn.style.display = e.target.files.length
+					? "inline-block"
+					: "none";
+			}
+		}
+		function viewImage(imageUrl) {
+			const modal = document.getElementById("imageModal");
+			const previewImage = document.getElementById("previewImage");
+			previewImage.src = imageUrl; // Set the source of the image to the provided URL
+			modal.style.display = "block"; // Show the modal
+		}
+
+
+
+		// Event Listeners
+		document.getElementById("closeModal").onclick = function () {
+			modal.style.display = "none";
+		};
+
+		downloadBtn.onclick = function () {
+			if (currentImageFile) {
+				const url = URL.createObjectURL(currentImageFile);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = currentImageFile.name;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+			}
+		};
+
+		window.onclick = function (event) {
+			if (event.target === modal) {
+				modal.style.display = "none";
+			}
+		};
+
+		document.addEventListener("change", handleFileInputChange);
 
 		/*
 		// Constants and Global Variables
