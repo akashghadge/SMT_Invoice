@@ -14,6 +14,107 @@ function getIndianDate() {
     return new Date().getTime() + offset;
 }
 
+router.post('/packedlist/get', async (req, res) => {
+    try {
+        const packedLists = await PackedList.find({}, {
+            generatedDate: 1,
+            invoiceNumber: 1,
+            partyCode: 1,
+            medicalName: 1,
+            medicalCity: 1,
+            imageLinks: 1,
+            checkStatus: 1,
+            _id: 0 // Exclude _id from response
+        }).populate('records'); // Populate the records field
+        res.status(200).json(packedLists[0].records);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error fetching data', error });
+    }
+})
+
+
+router.post('/checklist/get', async (req, res) => {
+    try {
+        const checkedLists = await CheckList.find({}, {
+            generatedDate: 1,
+            invoiceNumber: 1,
+            partyCode: 1,
+            medicalName: 1,
+            medicalCity: 1,
+            imageLinks: 1,
+            checkStatus: 1,
+            _id: 0 // Exclude _id from response
+        }).populate('records'); // Populate the records field
+        res.status(200).json(checkedLists[0].records);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error fetching data', error });
+    }
+})
+
+// Update checkUsername and remove record from checklist in a single query
+router.post('/checklist/update', async (req, res) => {
+    try {
+        const { record_id } = req.body;
+
+        // Ensure user is authenticated
+        if (!res.locals.username) {
+            return res.status(401).json({ message: 'Unauthorized: No user session found' });
+        }
+
+        // Find the logged-in user
+        const user = await User.findOne({ username: res.locals.username });
+        if (!user) {
+            return res.status(404).json({ message: 'No user found. Please log in again' });
+        }
+
+        // Update `Record` with `checkUsername` and `checkTimestamp`
+        const updatedRecord = await Record.findByIdAndUpdate(
+            record_id,
+            {
+                checkUsername: user._id, // Assign the user ID
+                checkTimestamp: new Date(), // Set the current timestamp
+                checkStatus: 'checked' // Mark as checked
+            },
+            { new: true } // Return the updated record
+        );
+
+        if (!updatedRecord) {
+            return res.status(404).json({ message: 'Record not found' });
+        }
+
+        // Remove the record from `CheckedList`
+        const updatedChecklist = await CheckList.findOneAndUpdate(
+            { records: record_id }, // Find checklist that contains the record
+            { $pull: { records: record_id } }, // Remove record from checklist
+            { new: true } // Return updated checklist
+        ).populate('records');
+
+        /*
+        Add this to checklist as well
+        */
+        let packedList = await PackedList.findOne();
+        if (!packedList) {
+            packedList = new PackedList({ records: [] });
+        }
+        packedList.records.push(updatedRecord._id);
+        await packedList.save();
+
+        res.status(200).json({
+            message: 'Check status updated and record removed from checklist',
+            updatedRecord,
+            updatedChecklist: updatedChecklist ? updatedChecklist.records : []
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating check status and removing record', error });
+    }
+});
+
+
+
+
 router.post('/invoice/create', async (req, res) => {
     const {
         invoiceNumber,
@@ -21,10 +122,13 @@ router.post('/invoice/create', async (req, res) => {
         partyCode,
         imageLinks,
     } = req.body;
-    console.log(req.body)
 
     try {
         const formattedDate = moment(new Date(generatedDate)).format('YYYY-MM-DD'); // Format the provided date
+        const user = await User.findOne({ username: res.locals.username });
+        if (!user) return res.status(404).json({
+            message: `No user found for the data. Please log in again`,
+        });
 
         // Create the new invoice record
         const newRecord = new Record({
@@ -32,6 +136,7 @@ router.post('/invoice/create', async (req, res) => {
             generatedDate,
             partyCode,
             imageLinks,
+            invoiceUsername: user._id
         });
 
         await newRecord.save(); // Save the new record in the `Record` collection
@@ -54,6 +159,18 @@ router.post('/invoice/create', async (req, res) => {
                 message: `No daily record found for the date: ${formattedDate}. Please create a daily record first.`,
             });
         }
+
+        /*
+            Add this to checklist as well
+        */
+        let checkedList = await CheckList.findOne();
+        if (!checkedList) {
+            checkedList = new CheckList({ records: [] });
+        }
+        checkedList.records.push(newRecord._id);
+        await checkedList.save();
+
+
 
 
         return res.status(201).json({
@@ -115,7 +232,7 @@ router.post('/invoice/reset', async (req, res) => {
                 newEndInvoice = record.invoiceNumber;
             }
         })
-        
+
         dailyRecord.endInvoiceNumber = newEndInvoice;
         // Save the updated DailyRecord
         await dailyRecord.save();

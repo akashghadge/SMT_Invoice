@@ -1,339 +1,481 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Main - Sanjivan Medico Traders</title>
-    <link rel="stylesheet" href="/styles.css" />
 
-    <style>
-      :root {
-        --primary-color: #3b82f6;
-        --secondary-color: #3b82f6;
-        --accent-color: #2a77f3;
-        --background-color: #ecf0f1;
-        --text-color: #333;
-        --white: #ffffff;
-        --error-color: #e74c3c;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Main - Sanjivan Medico Traders</title>
+  <link rel="stylesheet" href="/styles.css" />
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --secondary-color: #3b82f6;
+      --accent-color: #2a77f3;
+      --background-color: #ecf0f1;
+      --text-color: #333;
+      --white: #ffffff;
+      --error-color: #e74c3c;
+    }
 
-      body {
-        background-color: var(--background-color);
-        color: var(--text-color);
-        line-height: 1.6;
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      .header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
 
-      .header h1 {
-        font-size: 2.25rem;
-        font-weight: bold;
-      }
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-      .greeting-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: linear-gradient(to right, #616161, #757575);
-        color: white;
-        font-size: 1rem;
-      }
-      .greeting-container .logout {
-        background-color: #d32f2f;
-        color: white;
-        border: none;
-        padding: 8px;
-        cursor: pointer;
-        border-radius: 8px;
-        font-size: 0.9em;
-        transition: background-color 0.3s ease;
-      }
+    .header h1 {
+      font-size: 2.25rem;
+      font-weight: bold;
+    }
 
-      .greeting-container .logout:hover {
-        background-color: #b71c1c;
-      }
+    .greeting-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: linear-gradient(to right, #616161, #757575);
+      color: white;
+      font-size: 1rem;
+    }
 
-      .stats-container {
-        background-color: white;
-        padding: 1rem;
-        margin: 1rem auto;
-        max-width: 1200px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+    .greeting-container .logout {
+      background-color: #d32f2f;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 0.9em;
+      transition: background-color 0.3s ease;
+    }
 
-      .stats-container h3 {
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-      }
+    .greeting-container .logout:hover {
+      background-color: #b71c1c;
+    }
 
+    .stats-container {
+      background-color: white;
+      padding: 1rem;
+      margin: 1rem auto;
+      max-width: 1200px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-container h3 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--white);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: var(--secondary-color);
+      color: var(--white);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #d1d1d1;
+      border-radius: 4px;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 5px rgba(39, 174, 96, 0.3);
+    }
+
+    input.error {
+      border-color: var(--error-color);
+      box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
+    }
+
+    #add-button {
+      background-color: var(--accent-color);
+      color: var(--white);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #add-button:hover {
+      background-color: #173baf;
+    }
+
+    #add-button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .delete-btn {
+      background-color: var(--error-color);
+      color: var(--white);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 80%;
+      padding-top: 50px;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      max-height: calc(100vh - 100px);
+    }
+
+    .modal-buttons {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-content .close,
+    .modal-content .download {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      color: white;
+      border-radius: 5px;
+    }
+
+    .modal-content .close {
+      background: #e74c3c;
+    }
+
+    .modal-content .download {
+      background: #3b82f6;
+    }
+
+    @media screen and (max-width: 1024px) {
       .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      h2 {
-        color: var(--primary-color);
-        margin-bottom: 20px;
-        border-bottom: 2px solid var(--accent-color);
-        padding-bottom: 10px;
+        padding: 15px;
       }
 
       table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: var(--white);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
+        font-size: 14px;
       }
 
       th,
       td {
-        padding: 12px;
-        border: 1px solid #e0e0e0;
-        text-align: center;
-        vertical-align: middle;
-      }
-
-      th {
-        background-color: var(--secondary-color);
-        color: var(--white);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      input,
-      select {
-        width: 100%;
         padding: 10px;
-        margin: 5px 0;
-        border: 1px solid #d1d1d1;
-        border-radius: 4px;
-        transition: border-color 0.3s ease;
       }
+    }
 
-      input:focus,
-      select:focus {
-        outline: none;
-        border-color: var(--accent-color);
-        box-shadow: 0 0 5px rgba(39, 174, 96, 0.3);
+    @media screen and (max-width: 768px) {
+
+      table,
+      th,
+      td {
+        font-size: 12px;
       }
+    }
 
-      input.error {
-        border-color: var(--error-color);
-        box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
-      }
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      /* For smooth scrolling on iOS */
+      max-width: 100%;
+      /* Ensure container does not extend beyond viewport */
+    }
 
-      #add-button {
-        background-color: var(--accent-color);
-        color: var(--white);
-        border: none;
-        padding: 10px 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
+    #add-table {
+      width: auto;
+      min-width: 100%;
+      /* Prevent shrinking of table */
+      border-collapse: collapse;
+    }
 
-      #add-button:hover {
-        background-color: #173baf;
-      }
+    #add-table th,
+    #add-table td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+      white-space: nowrap;
+      /* Prevent text from wrapping */
+    }
 
-      #add-button:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
-      }
+    #add-table input,
+    #add-table select {
+      width: auto;
+      box-sizing: border-box;
+    }
 
-      .delete-btn {
-        background-color: var(--error-color);
-        color: var(--white);
-        border: none;
-        padding: 8px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
+    #party-code,
+    #party-code-dropdownSelect {
+      width: 15px;
+      /* Desired width */
 
-      .delete-btn:hover {
-        background-color: #c0392b;
-      }
+      font-size: 14px;
+      /* Adjust font size if necessary */
+    }
 
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 10;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        justify-content: center;
-        align-items: center;
-      }
+    .invoice-history-heading {
+      display: flex;
+      justify-content: space-between;
+    }
 
-      .modal-content {
-        position: relative;
-        max-width: 90%;
-        max-height: 80%;
-        padding-top: 50px;
-      }
+    /* Content wrapper to push footer down */
+    .content {
+      flex-grow: 1;
+    }
 
-      .modal-content img {
-        max-width: 100%;
-        max-height: calc(100vh - 100px);
-      }
+    /* Footer Styles */
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: var(--secondary-color);
+      color: white;
+      margin-top: 20px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
 
-      .modal-buttons {
-        position: absolute;
-        top: 0;
-        right: 0;
-        display: flex;
-        gap: 10px;
-      }
+<body>
+  <header class="header">
+    <h1>Sanjeevan Medico Traders</h1>
+  </header>
 
-      .modal-content .close,
-      .modal-content .download {
-        padding: 10px 20px;
-        font-size: 1rem;
-        cursor: pointer;
-        border: none;
-        color: white;
-        border-radius: 5px;
-      }
-
-      .modal-content .close {
-        background: #e74c3c;
-      }
-
-      .modal-content .download {
-        background: #3b82f6;
-      }
-
-      @media screen and (max-width: 1024px) {
-        .container {
-          padding: 15px;
-        }
-
-        table {
-          font-size: 14px;
-        }
-
-        th,
-        td {
-          padding: 10px;
-        }
-      }
-
-      @media screen and (max-width: 768px) {
-        table,
-        th,
-        td {
-          font-size: 12px;
-        }
-      }
-
-      .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
-        max-width: 100%; /* Ensure container does not extend beyond viewport */
-      }
-
-      #add-table {
-        width: auto;
-        min-width: 100%; /* Prevent shrinking of table */
-        border-collapse: collapse;
-      }
-
-      #add-table th,
-      #add-table td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-        white-space: nowrap; /* Prevent text from wrapping */
-      }
-
-      #add-table input,
-      #add-table select {
-        width: auto;
-        box-sizing: border-box;
-      }
-
-      #party-code,
-      #party-code-dropdownSelect {
-        width: 15px; /* Desired width */
-
-        font-size: 14px; /* Adjust font size if necessary */
-      }
-      .invoice-history-heading {
-        display: flex;
-        justify-content: space-between;
-      }
-      /* Content wrapper to push footer down */
-      .content {
-        flex-grow: 1;
-      }
-      /* Footer Styles */
-      footer {
-        text-align: center;
-        padding: 10px;
-        background-color: var(--secondary-color);
-        color: white;
-        margin-top: 20px;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-      }
-    </style>
-  </head>
-
-  <body>
-    <header class="header">
-      <h1>Sanjeevan Medico Traders</h1>
-    </header>
-
-    <div class="greeting-container">
-      <div class="greeting" id="greeting"></div>
-      <div>
-        <button class="logout" id="logout-btn">Logout</button>
-      </div>
+  <div class="greeting-container">
+    <div class="greeting" id="greeting"></div>
+    <div>
+      <button class="logout" id="logout-btn">Logout</button>
     </div>
+  </div>
 
-    <div class="container">
-      <h2>Unchecked invoice (Pending)</h2>
-      <div class="table-wrapper">
-        <table id="add-table">
-          <thead>
-            <tr>
-              <th>Sr. No.</th>
-              <th>Date</th>
-              <th>Invoice No.</th>
-              <th>Party Code</th>
-              <th>Medical name</th>
-              <th>City</th>
-              <th>Bill Image</th>
-              <th>Checking Status</th>
-            </tr>
-          </thead>
-          <tbody id="add-row">
-            <tr>
+  <div class="container">
+    <h2>Unchecked invoice (Pending)</h2>
+    <div class="table-wrapper">
+      <table id="add-table">
+        <thead>
+          <tr>
+            <th>Sr. No.</th>
+            <th>Date</th>
+            <th>Invoice No.</th>
+            <th>Party Code</th>
+            <th>Medical name</th>
+            <th>City</th>
+            <th>Bill Image</th>
+            <th>Checking Status</th>
+          </tr>
+        </thead>
+        <tbody id="add-row">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="invoice-history-heading">
+      <h2>Checked Invoice</h2>
+      <h2 id="total-amount-heading">
+        Total Invoices Checked : <span id="total-invoices">0</span>
+      </h2>
+    </div>
+    <div class="table-wrapper">
+      <table id="record-table">
+        <thead>
+          <tr>
+            <th>Sr. No.</th>
+            <th>Date</th>
+            <th>Invoice No.</th>
+            <th>Party Code</th>
+            <th>Medical name</th>
+            <th>City</th>
+            <th>Bill Image</th>
+            <th>Checking Status</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="record-history"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Use a single modal ID here to avoid duplication -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-buttons">
+        <button class="close" onclick="closeModal()">Close</button>
+        <button class="download" id="download-btn-2">Download</button>
+      </div>
+      <img id="modal-img" src="" alt="Bill Preview" />
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; Sanjeevan Medico Traders, <span id="current-year"></span></p>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+  <script>
+    async function confirmAndMoveRow(checkbox, event) {
+      // Stop if this wasn't a genuine user click
+      if (!event.isTrusted) {
+        checkbox.checked = false;
+        return;
+      }
+      // If checkbox was unchecking, ignore
+      if (!checkbox.checked) {
+        checkbox.checked = false;
+        return;
+      }
+      const firstConfirm = confirm(
+        "Move this invoice to the Checked list? Verify all details—this action is final."
+      );
+      if (!firstConfirm) {
+        checkbox.checked = false;
+        return;
+      }
+      const secondConfirm = confirm(
+        "Confirm: Are the items ready for packing?"
+      );
+      if (!secondConfirm) {
+        checkbox.checked = false;
+        return;
+      }
+      try {
+        // make api hit
+        const response = await fetch('/api/record/checklist/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            record_id: checkbox.getAttribute('data-record_id'),
+            token: localStorage.getItem('jwt')
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Error reset invoice');
+        }
+        console.log(result);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to reset invoice: ' + error.message);
+      }
+    }
+
+    async function UpdateRows() {
+      try {
+        // change on server
+        const response = await fetch('/api/record/checklist/get', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token: localStorage.getItem('jwt')
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Error reset invoice');
+        }
+        ShowRows(result);
+      }
+      catch (error) {
+        console.error('Error:', error);
+        alert('Failed to reset invoice: ' + error.message);
+      }
+    }
+    async function ShowRows(result) {
+      // show the rows
+      const tableData = document.getElementById('add-row');
+      console.log(result);
+      result.forEach(row => {
+        tableData.innerHTML +=
+          `
+          <tr>
               <td>1</td>
-              <td>Date</td>
-              <td>Invoice No.</td>
-              <td>Party Code</td>
+              <td>${moment(row.generatedDate).format('DD-MM-YYYY')}</td>
+              <td>${row.invoiceNumber}</td>
+              <td>${row.partyCode}</td>
               <td>Medical name</td>
               <td>City</td>
               <td>
@@ -347,7 +489,7 @@
                         Download
                       </button>
                     </div>
-                    <img id="modal-img" src="" alt="Bill Preview" />
+                    <img id="modal-img" src="${row.imageLinks[0]}" alt="Bill Preview" />
                   </div>
                 </div>
               </td>
@@ -357,6 +499,7 @@
                   <input
                     type="checkbox"
                     id="_checkbox-26"
+                    data-record_id="${row._id}"
                     onclick="confirmAndMoveRow(this, event)"
                   />
                   <label for="_checkbox-26">
@@ -365,132 +508,48 @@
                 </div>
               </td>
             </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+        `
+      });
+    }
+    function updateTotalInvoices() {
 
-    <div class="container">
-      <div class="invoice-history-heading">
-        <h2>Checked Invoice</h2>
-        <h2 id="total-amount-heading">
-          Total Invoices Checked : <span id="total-invoices">0</span>
-        </h2>
-      </div>
-      <div class="table-wrapper">
-        <table id="record-table">
-          <thead>
-            <tr>
-              <th>Sr. No.</th>
-              <th>Date</th>
-              <th>Invoice No.</th>
-              <th>Party Code</th>
-              <th>Medical name</th>
-              <th>City</th>
-              <th>Bill Image</th>
-              <th>Checking Status</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody id="record-history"></tbody>
-        </table>
-      </div>
-    </div>
+    }
 
-    <!-- Use a single modal ID here to avoid duplication -->
-    <div id="modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-buttons">
-          <button class="close" onclick="closeModal()">Close</button>
-          <button class="download" id="download-btn-2">Download</button>
-        </div>
-        <img id="modal-img" src="" alt="Bill Preview" />
-      </div>
-    </div>
+    document.getElementById("current-year").textContent =
+      new Date().getFullYear();
 
-    <footer>
-      <p>&copy; Sanjeevan Medico Traders, <span id="current-year"></span></p>
-    </footer>
-
-    <script>
-      function confirmAndMoveRow(checkbox, event) {
-        // Stop if this wasn't a genuine user click
-        if (!event.isTrusted) {
-          checkbox.checked = false;
-          return;
-        }
-        // If checkbox was unchecking, ignore
-        if (!checkbox.checked) {
-          checkbox.checked = false;
-          return;
-        }
-        const firstConfirm = confirm(
-          "Move this invoice to the Checked list? Verify all details—this action is final."
-        );
-        if (!firstConfirm) {
-          checkbox.checked = false;
-          return;
-        }
-        const secondConfirm = confirm(
-          "Confirm: Are the items ready for packing?"
-        );
-        if (!secondConfirm) {
-          checkbox.checked = false;
-          return;
-        }
-        // Move row and add timestamp
-        const row = checkbox.closest("tr");
-        row.remove();
-        // Insert a timestamp cell at the end (9th column)
-        const newCell = document.createElement("td");
-        newCell.textContent = new Date().toLocaleString();
-        row.appendChild(newCell);
-
-        document.getElementById("record-history").appendChild(row);
-        checkbox.disabled = true;
-        updateTotalInvoices();
+    async function updateGreeting() {
+      const now = new Date();
+      const hour = now.getHours();
+      const greetingEl = document.getElementById("greeting");
+      let greeting = "Good Evening, ";
+      if (hour < 12) greeting = "Good Morning, ";
+      else if (hour < 18) greeting = "Good Afternoon, ";
+      try {
+        const userData = localStorage.getItem("user");
+        const userName = userData ? JSON.parse(userData).username : "Employee";
+        greetingEl.textContent = greeting + userName;
+      } catch (error) {
+        greetingEl.textContent = greeting + "Employee";
       }
+    }
 
-      function updateTotalInvoices() {
-        const checkedCheckboxes = document.querySelectorAll(
-          'input[type="checkbox"]:checked'
-        );
-        const totalInvoices = checkedCheckboxes.length;
-        document.getElementById("total-invoices").textContent = totalInvoices;
-      }
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
+    }
 
-      document.getElementById("current-year").textContent =
-        new Date().getFullYear();
+    window.onload = () => {
+      updateGreeting();
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        location.href = "/login.html";
+      });
+      // Ensure checkbox is always unchecked on load
+      // const checkBox = document.getElementById("_checkbox-26");
+      // if (checkBox) checkBox.checked = false;
 
-      async function updateGreeting() {
-        const now = new Date();
-        const hour = now.getHours();
-        const greetingEl = document.getElementById("greeting");
-        let greeting = "Good Evening, ";
-        if (hour < 12) greeting = "Good Morning, ";
-        else if (hour < 18) greeting = "Good Afternoon, ";
-        try {
-          const userData = localStorage.getItem("user");
-          const userName = userData ? JSON.parse(userData).name : "Employee";
-          greetingEl.textContent = greeting + userName;
-        } catch (error) {
-          greetingEl.textContent = greeting + "Employee";
-        }
-      }
+      UpdateRows();
+    };
+  </script>
+</body>
 
-      function closeModal() {
-        document.getElementById("modal").style.display = "none";
-      }
-
-      window.onload = () => {
-        updateGreeting();
-        document.getElementById("logout-btn").addEventListener("click", () => {
-          location.href = "/login.html";
-        });
-        // Ensure checkbox is always unchecked on load
-        const checkBox = document.getElementById("_checkbox-26");
-        if (checkBox) checkBox.checked = false;
-      };
-    </script>
-  </body>
 </html>

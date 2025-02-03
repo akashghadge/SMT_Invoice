@@ -26,13 +26,13 @@ const Record = require("./routes/Record.route");
 // routes setting
 app.use("/api/user", User);
 app.use("/api/code", verify, Code);
-app.use('/api/record/', Record);
+app.use('/api/record/', verify, Record);
 // for production use
 app.use(express.static("client"));
 const path = require("path");
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "invoice.html"));
+  res.sendFile(path.join(__dirname, "client", "login.html"));
 });
 
 app.listen(port, () => {

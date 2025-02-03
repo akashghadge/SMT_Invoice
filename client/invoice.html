@@ -441,7 +441,12 @@
 				const res = await fetch("/api/record/daily-records/generate/add", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ date, startInvoiceNumber: parseInt(startInvoice), records: [] }),
+					body: JSON.stringify({
+						date, startInvoiceNumber: parseInt(startInvoice),
+						token: localStorage.getItem('jwt')
+						,
+						records: []
+					}),
 				});
 				const data = await res.json();
 				if (!res.ok) {
@@ -478,7 +483,10 @@
 					const res = await fetch("/api/record/daily-records/date", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ date }),
+						body: JSON.stringify({
+							date,
+							token: localStorage.getItem('jwt')
+						}),
 					});
 					const data = await res.json();
 					tableBody.innerHTML = ""; // Clear table
@@ -511,6 +519,7 @@
 
 			dateInput.addEventListener("change", (e) => fetchRecords(e.target.value)); // Fetch on date change
 			fetchRecords(dateInput.value); // Initial fetch
+			updateGreeting();
 		};
 
 
@@ -603,7 +612,10 @@
 					headers: {
 						'Content-Type': 'application/json',
 					},
-					body: JSON.stringify({ invoiceNumber: invoiceNumberToReset }),
+					body: JSON.stringify({
+						invoiceNumber: invoiceNumberToReset,
+						token: localStorage.getItem('jwt')
+					}),
 				});
 
 				const result = await response.json();
@@ -651,6 +663,7 @@
 						generatedDate: moment.utc(date, "DD-MM-YYYY").startOf('day').toDate(),
 						partyCode: partyCode,
 						imageLinks: [data.url],
+						token: localStorage.getItem('jwt')
 					};
 					let latestData = await createInvoice(invoiceData);
 					CURRENT_ROWS[parseInt(indexOfRow) - 1] = latestData;
@@ -862,6 +875,29 @@
 		};
 
 		document.addEventListener("change", handleFileInputChange);
+
+		async function updateGreeting() {
+			const now = new Date();
+			const hour = now.getHours();
+			const greetingEl = document.getElementById("greeting");
+
+			let greeting = "Good Evening, ";
+			if (hour < 12) {
+				greeting = "Good Morning, ";
+			} else if (hour < 18) {
+				greeting = "Good Afternoon, ";
+			}
+
+			try {
+				// Attempt to fetch the user's name from localStorage
+				const userData = localStorage.getItem("user");
+				const userName = userData ? JSON.parse(userData).username : "Employee";
+				greetingEl.textContent = greeting + userName;
+			} catch (error) {
+				console.error("Error fetching user data:", error);
+				greetingEl.textContent = greeting + "Employee"; // Fallback to "Employee"
+			}
+		}
 
 		/*
 		// Constants and Global Variables
