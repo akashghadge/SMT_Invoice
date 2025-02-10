@@ -568,8 +568,8 @@
 
 		function isSameDate(apiDate) {
 			const getIndianDate = () => {
-				const offset = 5.5 * 60 * 60 * 1000; // IST offset
-				return new Date(new Date().getTime() + offset);
+				// const offset = 5.5 * 60 * 60 * 1000; // IST offset
+				return new Date(new Date().getTime());
 			};
 			const today = moment(getIndianDate()).format('YYYY-MM-DD'); // Format the date as "YYYY-MM-DD"
 			apiDate = moment(apiDate).format('YYYY-MM-DD');

@@ -8,11 +8,256 @@ const DailyRecord = require('../models/dailyRecord');
 const CheckList = require('../models/CheckedList');
 const PackedList = require('../models/PackedList');
 const DeliveredList = require('../models/DeliveredList');
+const TransitList = require("../models/TransitList");
 
 function getIndianDate() {
-    const offset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
-    return new Date().getTime() + offset;
+    const now = new Date();
+    // IST is UTC + 5 hours 30 minutes
+    const istOffset = 5.5 * 60 * 60 * 1000; // Offset in milliseconds
+    // Convert to IST
+    const istTime = new Date(now.getTime() + istOffset + (now.getTimezoneOffset() * 60000));
+
+    return istTime;
 }
+
+// Update checkUsername and remove record from checklist in a single query
+router.post('/delivered/update', async (req, res) => {
+    try {
+        const { record_id } = req.body;
+
+        // Ensure user is authenticated
+        if (!res.locals.username) {
+            return res.status(401).json({ message: 'Unauthorized: No user session found' });
+        }
+
+        // Find the logged-in user
+        const user = await User.findOne({ username: res.locals.username });
+        if (!user) {
+            return res.status(404).json({ message: 'No user found. Please log in again' });
+        }
+
+        // Update `Record` with `checkUsername` and `checkTimestamp`
+        const updatedRecord = await Record.findByIdAndUpdate(
+            record_id,
+            {
+                deliveredUser: user._id, // Assign the user ID
+                deliveredTimestamp: new Date(), // Set the current timestamp
+                deliveryStatus: 'delivered' // Mark as checked
+            },
+            { new: true } // Return the updated record
+        );
+
+        if (!updatedRecord) {
+            return res.status(404).json({ message: 'Record not found' });
+        }
+
+        // Remove the record from `CheckedList`
+        const updatedTransitList = await TransitList.findOneAndUpdate(
+            { records: record_id }, // Find checklist that contains the record
+            { $pull: { records: record_id } }, // Remove record from checklist
+            { new: true } // Return updated checklist
+        ).populate('records');
+
+        res.status(200).json({
+            message: 'Check status updated and record removed from checklist',
+            updatedTransitList,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating packed status and removing record', error });
+    }
+});
+
+
+// Update checkUsername and remove record from checklist in a single query
+router.post('/pickup/update', async (req, res) => {
+    try {
+        const { record_id } = req.body;
+        console.log(record_id); 
+
+        // Ensure user is authenticated
+        if (!res.locals.username) {
+            return res.status(401).json({ message: 'Unauthorized: No user session found' });
+        }
+
+        // Find the logged-in user
+        const user = await User.findOne({ username: res.locals.username });
+        if (!user) {
+            return res.status(404).json({ message: 'No user found. Please log in again' });
+        }
+
+        // Update `Record` with `checkUsername` and `checkTimestamp`
+        const updatedRecord = await Record.findByIdAndUpdate(
+            record_id,
+            {
+                pickupUser: user._id, // Assign the user ID
+                pickupTimestamp: new Date(), // Set the current timestamp
+                deliveryStatus: 'waiting' // Mark as checked
+            },
+            { new: true } // Return the updated record
+        );
+
+        if (!updatedRecord) {
+            return res.status(404).json({ message: 'Record not found' });
+        }
+
+        // Remove the record from `CheckedList`
+        const updatedDeliveredList = await DeliveredList.findOneAndUpdate(
+            { records: record_id }, // Find checklist that contains the record
+            { $pull: { records: record_id } }, // Remove record from checklist
+            { new: true } // Return updated checklist
+        ).populate('records');
+
+        /*
+        Add this to checklist as well
+        */
+        let transitList = await TransitList.findOne();
+        if (!transitList) {
+            transitList = new TransitList({ records: [] });
+        }
+        transitList.records.push(updatedRecord._id);
+        await transitList.save();
+
+        res.status(200).json({
+            message: 'Check status updated and record removed from checklist',
+            updatedDeliveredList,
+            transitList: transitList ? transitList.records : []
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating packed status and removing record', error });
+    }
+});
+
+
+
+router.post('/deliver/get', async (req, res) => {
+    try {
+        const deliveredList = await DeliveredList.find({}, {
+            generatedDate: 1,
+            invoiceNumber: 1,
+            partyCode: 1,
+            medicalName: 1,
+            medicalCity: 1,
+            imageLinks: 1,
+            checkStatus: 1,
+            _id: 0 // Exclude _id from response
+        }).populate('records'); // Populate the records field
+
+        const transitList = await TransitList.find({}, {
+            generatedDate: 1,
+            invoiceNumber: 1,
+            partyCode: 1,
+            medicalName: 1,
+            medicalCity: 1,
+            imageLinks: 1,
+            checkStatus: 1,
+            _id: 0 // Exclude _id from response
+        }).populate('records'); // Populate the records field
+
+
+        const actualDate = getIndianDate();
+        const formattedDate = moment(actualDate).format('YYYY-MM-DD'); // Format the date as "YYYY-MM-DD"
+
+        const dailyRecords = await DailyRecord.findOne({ date: formattedDate })
+            .populate({
+                path: 'records',
+                model: 'Record',
+                populate: {
+                    path: 'deliveredUser',
+                    model: 'User',
+                    select: 'username email' // Explicitly select required fields
+                }
+            }).exec();
+
+        if (!dailyRecords)
+            return res.status(200).json({
+                success: true,
+                deliveredList: (deliveredList.length == 0) ? [] : deliveredList[0].records,
+                transitList: (transitList.length == 0) ? [] : transitList[0].records,
+                records: []
+            });
+
+
+        const filteredRecords =
+            dailyRecords.records
+                .filter((r) => {
+                    return (r.deliveredUser) && (r.deliveredUser.username === res.locals.username);
+                })
+
+        res.status(200).json({
+            success: true,
+            deliveredList: (deliveredList.length == 0) ? [] : deliveredList[0].records,
+            transitList: (transitList.length == 0) ? [] : transitList[0].records,
+            records: filteredRecords
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error fetching data', error });
+    }
+})
+
+
+// Update checkUsername and remove record from checklist in a single query
+router.post('/packedlist/update', async (req, res) => {
+    try {
+        const { record_id } = req.body;
+
+        // Ensure user is authenticated
+        if (!res.locals.username) {
+            return res.status(401).json({ message: 'Unauthorized: No user session found' });
+        }
+
+        // Find the logged-in user
+        const user = await User.findOne({ username: res.locals.username });
+        if (!user) {
+            return res.status(404).json({ message: 'No user found. Please log in again' });
+        }
+
+        // Update `Record` with `checkUsername` and `checkTimestamp`
+        const updatedRecord = await Record.findByIdAndUpdate(
+            record_id,
+            {
+                packageUser: user._id, // Assign the user ID
+                packageTimestamp: new Date(), // Set the current timestamp
+                packageStatus: 'packed' // Mark as checked
+            },
+            { new: true } // Return the updated record
+        );
+
+        if (!updatedRecord) {
+            return res.status(404).json({ message: 'Record not found' });
+        }
+
+        // Remove the record from `CheckedList`
+        const updatedPackedList = await PackedList.findOneAndUpdate(
+            { records: record_id }, // Find checklist that contains the record
+            { $pull: { records: record_id } }, // Remove record from checklist
+            { new: true } // Return updated checklist
+        ).populate('records');
+
+        /*
+        Add this to checklist as well
+        */
+        let deliveredList = await DeliveredList.findOne();
+        if (!deliveredList) {
+            deliveredList = new DeliveredList({ records: [] });
+        }
+        deliveredList.records.push(updatedRecord._id);
+        await deliveredList.save();
+
+        res.status(200).json({
+            message: 'Check status updated and record removed from checklist',
+            updatedRecord,
+            updatedPackedList: updatedPackedList ? updatedPackedList.records : []
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating packed status and removing record', error });
+    }
+});
+
+
 
 router.post('/packedlist/get', async (req, res) => {
     try {
@@ -26,7 +271,31 @@ router.post('/packedlist/get', async (req, res) => {
             checkStatus: 1,
             _id: 0 // Exclude _id from response
         }).populate('records'); // Populate the records field
-        res.status(200).json(packedLists[0].records);
+
+        const actualDate = getIndianDate();
+        const formattedDate = moment(actualDate).format('YYYY-MM-DD'); // Format the date as "YYYY-MM-DD"
+
+        const dailyRecords = await DailyRecord.findOne({ date: formattedDate })
+            .populate({
+                path: 'records',
+                model: 'Record',
+                populate: {
+                    path: 'packageUser',
+                    model: 'User',
+                    select: 'username email' // Explicitly select required fields
+                }
+            }).exec();
+
+        if (!dailyRecords)
+            return res.status(200).json({ success: true, packedLists: packedLists[0].records, records: [] });
+
+
+        const filteredRecords =
+            dailyRecords.records
+                .filter((r) => {
+                    return (r.packageUser) && (r.packageUser.username === res.locals.username);
+                })
+        res.status(200).json({ success: true, packedLists: packedLists[0].records, records: filteredRecords });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error fetching data', error });
@@ -46,7 +315,30 @@ router.post('/checklist/get', async (req, res) => {
             checkStatus: 1,
             _id: 0 // Exclude _id from response
         }).populate('records'); // Populate the records field
-        res.status(200).json(checkedLists[0].records);
+
+        const actualDate = getIndianDate();
+        const formattedDate = moment(actualDate).format('YYYY-MM-DD'); // Format the date as "YYYY-MM-DD"
+
+        const dailyRecords = await DailyRecord.findOne({ date: formattedDate })
+            .populate({
+                path: 'records',
+                model: 'Record',
+                populate: {
+                    path: 'checkUsername',
+                    model: 'User',
+                    select: 'username email' // Explicitly select required fields
+                }
+            }).exec();
+
+        if (!dailyRecords)
+            return res.status(200).json({ success: true, checkList: checkedLists[0].records, records: [] });
+
+        const filteredRecords =
+            dailyRecords.records
+                .filter((r) => {
+                    return (r.checkUsername) && (r.checkUsername.username === res.locals.username);
+                })
+        res.status(200).json({ success: true, checkList: checkedLists[0].records, records: filteredRecords });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error fetching data', error });
@@ -169,8 +461,6 @@ router.post('/invoice/create', async (req, res) => {
         }
         checkedList.records.push(newRecord._id);
         await checkedList.save();
-
-
 
 
         return res.status(201).json({

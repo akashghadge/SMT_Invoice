@@ -457,6 +457,7 @@
         if (!response.ok) {
           throw new Error(result.message || 'Error reset invoice');
         }
+        console.log(result);
         ShowRows(result);
       }
       catch (error) {
@@ -467,8 +468,7 @@
     async function ShowRows(result) {
       // show the rows
       const tableData = document.getElementById('add-row');
-      console.log(result);
-      result.forEach(row => {
+      result.checkList.forEach(row => {
         tableData.innerHTML +=
           `
           <tr>
@@ -479,20 +479,10 @@
               <td>Medical name</td>
               <td>City</td>
               <td>
-                <div id="modal-1" class="modal">
-                  <div class="modal-content">
-                    <div class="modal-buttons">
-                      <button class="close" onclick="closeModal()">
-                        Close
-                      </button>
-                      <button class="download" id="download-btn-1">
-                        Download
-                      </button>
-                    </div>
-                    <img id="modal-img" src="${row.imageLinks[0]}" alt="Bill Preview" />
-                  </div>
-                </div>
-              </td>
+        ${row.imageLinks && row.imageLinks.length > 0
+            ? `<button onclick="openModal('${row.imageLinks[0]}')">View</button>`
+            : 'No Image'}
+                </td>
               <td>
                 <div class="checkbox-wrapper-26">
                   <!-- Ensure checkbox is unchecked by default -->
@@ -510,7 +500,51 @@
             </tr>
         `
       });
+
+
+      // show lower table
+      const tableBody = document.getElementById('record-history');
+
+      // Check if result.records exists and is an array
+      if (Array.isArray(result.records)) {
+        result.records.forEach((row, index) => {
+          const newRow = document.createElement("tr");
+
+          newRow.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${moment(row.generatedDate).format('DD-MM-YYYY')}</td>
+      <td>${row.invoiceNumber}</td>
+      <td>${row.partyCode}</td>
+      <td>${row.medicalName || 'N/A'}</td>
+      <td>${row.medicalCity || 'N/A'}</td>
+      <td>
+        ${row.imageLinks && row.imageLinks.length > 0
+              ? `<button onclick="openModal('${row.imageLinks[0]}')">View</button>`
+              : 'No Image'}
+      </td>
+      <td>
+        <div class="checkbox-wrapper-26">
+          <input
+            type="checkbox"
+            id="checkbox-${index}"
+            data-record_id="${row._id}"
+            checked
+            disabled
+          />
+          <label for="checkbox-${index}">
+            <div class="tick_mark"></div>
+          </label>
+        </div>
+      </td>
+      <td>${row.checkTimestamp ? moment(row.checkTimestamp).format('DD-MM-YYYY HH:mm:ss') : 'Not Checked'}</td>
+    `;
+
+          tableBody.appendChild(newRow);
+        });
+      }
     }
+
+
     function updateTotalInvoices() {
 
     }
@@ -534,9 +568,33 @@
       }
     }
 
-    function closeModal() {
-      document.getElementById("modal").style.display = "none";
+
+    // Function to open modal for bill image preview
+    function openModal(imageUrl) {
+      const modalHtml = `
+    <div id="modal-1" class="modal" style="display: block;">
+      <div class="modal-content">
+        <div class="modal-buttons">
+          <button class="close" onclick="closeModal()">Close</button>
+          <a href="${imageUrl}" download target="_blank">
+            <button class="download">Download</button>
+          </a>
+        </div>
+        <img id="modal-img" src="${imageUrl}" alt="Bill Preview" />
+      </div>
+    </div>
+  `;
+      document.body.insertAdjacentHTML("beforeend", modalHtml);
     }
+
+    // Function to close modal
+    function closeModal() {
+      const modal = document.getElementById("modal-1");
+      if (modal) modal.remove();
+    }
+    // function closeModal() {
+    //   document.getElementById("modal").style.display = "none";
+    // }
 
     window.onload = () => {
       updateGreeting();
