@@ -23,7 +23,7 @@ function getIndianDate() {
 // Update checkUsername and remove record from checklist in a single query
 router.post('/delivered/update', async (req, res) => {
     try {
-        const { record_id } = req.body;
+        const { record_id, locationLink } = req.body;
 
         // Ensure user is authenticated
         if (!res.locals.username) {
@@ -41,8 +41,9 @@ router.post('/delivered/update', async (req, res) => {
             record_id,
             {
                 deliveredUser: user._id, // Assign the user ID
-                deliveredTimestamp: new Date(), // Set the current timestamp
-                deliveryStatus: 'delivered' // Mark as checked
+                deliveredTimestamp: getIndianDate(), // Set the current timestamp
+                deliveryStatus: 'delivered',
+                locationLink: locationLink
             },
             { new: true } // Return the updated record
         );
@@ -73,7 +74,7 @@ router.post('/delivered/update', async (req, res) => {
 router.post('/pickup/update', async (req, res) => {
     try {
         const { record_id } = req.body;
-        console.log(record_id); 
+        console.log(record_id);
 
         // Ensure user is authenticated
         if (!res.locals.username) {
@@ -91,7 +92,7 @@ router.post('/pickup/update', async (req, res) => {
             record_id,
             {
                 pickupUser: user._id, // Assign the user ID
-                pickupTimestamp: new Date(), // Set the current timestamp
+                pickupTimestamp: getIndianDate(), // Set the current timestamp
                 deliveryStatus: 'waiting' // Mark as checked
             },
             { new: true } // Return the updated record
@@ -184,7 +185,7 @@ router.post('/deliver/get', async (req, res) => {
                 .filter((r) => {
                     return (r.deliveredUser) && (r.deliveredUser.username === res.locals.username);
                 })
-
+        console.log(filteredRecords);
         res.status(200).json({
             success: true,
             deliveredList: (deliveredList.length == 0) ? [] : deliveredList[0].records,
@@ -219,7 +220,7 @@ router.post('/packedlist/update', async (req, res) => {
             record_id,
             {
                 packageUser: user._id, // Assign the user ID
-                packageTimestamp: new Date(), // Set the current timestamp
+                packageTimestamp: getIndianDate(), // Set the current timestamp
                 packageStatus: 'packed' // Mark as checked
             },
             { new: true } // Return the updated record
@@ -366,7 +367,7 @@ router.post('/checklist/update', async (req, res) => {
             record_id,
             {
                 checkUsername: user._id, // Assign the user ID
-                checkTimestamp: new Date(), // Set the current timestamp
+                checkTimestamp: getIndianDate(), // Set the current timestamp
                 checkStatus: 'checked' // Mark as checked
             },
             { new: true } // Return the updated record

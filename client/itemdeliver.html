@@ -453,6 +453,7 @@
       }
       try {
         // make api hit
+        const locationLink = await getLocation();
         const response = await fetch('/api/record/delivered/update', {
           method: 'POST',
           headers: {
@@ -460,7 +461,8 @@
           },
           body: JSON.stringify({
             record_id: checkbox.getAttribute('data-record_id'),
-            token: localStorage.getItem('jwt')
+            token: localStorage.getItem('jwt'),
+            locationLink: locationLink
           }),
         });
 
@@ -541,6 +543,7 @@
       catch (error) {
         console.error('Error:', error);
         alert('Failed to reset invoice: ' + error.message);
+        location.href = '/';
       }
     }
 
@@ -609,6 +612,32 @@
         `
       });
 
+      const deliveredRows = document.getElementById('record-history');
+      result.records.forEach(row => {
+        deliveredRows.innerHTML +=
+          `
+          <tr>
+              <td>1</td>
+              <td>${moment(row.generatedDate).format('DD-MM-YYYY')}</td>
+              <td>${row.invoiceNumber}</td>
+              <td>${row.partyCode}</td>
+              <td>Medical name</td>
+              <td>City</td>
+              <td>
+        ${row.imageLinks && row.imageLinks.length > 0
+            ? `<button onclick="openModal('${row.imageLinks[0]}')">View</button>`
+            : 'No Image'}
+                </td>
+  <td>
+    ${moment(row.deliveredTimestamp).format("DD-MM-YYYY HH:mm:ss")}
+  </td>
+  <td>
+<a href="${row.locationLink}" target="_blank" class="location-link">Open in Google Maps</a> 
+</td>
+                </tr>
+        `
+      });
+
 
     }
 
@@ -633,7 +662,7 @@
       else if (hour < 18) greeting = "Good Afternoon, ";
       try {
         const userData = localStorage.getItem("user");
-        const userName = userData ? JSON.parse(userData).name : "Employee";
+        const userName = userData ? JSON.parse(userData).username : "Employee";
         greetingEl.textContent = greeting + userName;
       } catch (error) {
         greetingEl.textContent = greeting + "Employee";
@@ -671,6 +700,26 @@
     function closeModal() {
       const modal = document.getElementById("modal-1");
       if (modal) modal.remove();
+    }
+
+    function getLocation() {
+      return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+              resolve(googleMapsLink);
+            },
+            (error) => {
+              reject(error);
+            }
+          );
+        } else {
+          reject(new Error("Geolocation is not supported by this browser."));
+        }
+      });
     }
 
   </script>

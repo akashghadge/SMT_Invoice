@@ -28,7 +28,8 @@ const recordSchema = new mongoose.Schema({
     pickupUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to User for pickup
     pickupTimestamp: { type: Date }, // Timestamp for when the pickup occurred
     deliveredUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to User for delivery
-    deliveredTimestamp: { type: Date }, // Timestamp for when the delivery occurred
+    deliveredTimestamp: { type: Date }, // Timestamp for when the delivery occurred,
+    locationLink: { type: String }
 });
 
 // Apply the auto-increment plugin to the `ID` field
